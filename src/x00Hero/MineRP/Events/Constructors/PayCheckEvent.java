@@ -7,9 +7,9 @@ import x00Hero.MineRP.Player.RPlayer;
 
 public class PayCheckEvent extends Event {
     private HandlerList handlerList = new HandlerList();
-    RPlayer rPlayer;
-    long amount;
-    int delay;
+    private RPlayer rPlayer;
+    private long amount;
+    private int delay;
 
     public PayCheckEvent(RPlayer rPlayer, long amount, int delay) {
         this.rPlayer = rPlayer;

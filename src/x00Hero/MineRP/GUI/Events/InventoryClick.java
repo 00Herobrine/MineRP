@@ -17,11 +17,10 @@ import x00Hero.MineRP.GUI.Constructors.MenuItemClickedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 import static x00Hero.MineRP.Main.plugin;
 
-public class MenuController implements Listener {
+public class InventoryClick implements Listener {
     private static HashMap<Player, Menu> inMenus = new HashMap<>();
     // maybe temporarily store the Player with playerFile in a hashmap so I don't need to constantly store all this in NBT (can be viewed by players)
     // HashMap<Player, File> fileAccess
@@ -34,22 +33,6 @@ public class MenuController implements Listener {
             return container.get(namespacedKey, PersistentDataType.STRING);
         }
         return null;
-    }
-
-
-    @EventHandler
-    public void MenuClicked(MenuItemClickedEvent event) {
-        Player player = event.getWhoClicked();
-        Menu menu = event.getMenu();
-        MenuItem menuItem = event.getMenuItem();
-        if(menuItem.isCancelClick()) event.setCancelled(true);
-        String ID = event.getID();
-        String args[] = ID.split("/");
-        ItemStack itemStack = event.getMenuItem().getItemStack();
-        switch(args[0]) {
-            default:
-                break;
-        }
     }
 
     public static void setMenu(Player player, Menu menu) {
