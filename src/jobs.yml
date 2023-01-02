@@ -1,0 +1,27 @@
+jobs:
+  citizen: # job id
+    name: "Citizen" # what is display in the UI
+    title: "Citizen" # what displays under their name
+    description: "Just trying to get by in this place called a City."
+    material: PAPER
+    wage: 10
+    interval: 600 # in seconds
+    max: -1 # the max amount of the workers at one time (-1 is uncapped)
+    lostOnDeath: false # lose the role and revert back to the default role after death
+    default: true
+  mayor:
+    name: "Mayor"
+    title: "Mayor"
+    description: "Mayor of the shit hole"
+    material: RED_CONCRETE
+    wage: 100
+    interval: 600
+    max: 1
+    lostOnDeath: true
+  thief:
+    name: "Thief"
+    title: "Thief"
+    description: "Taken the path of ratting for other people's items."
+    material: RED_CONCRETE
+    wage: 100
+    interval: 600

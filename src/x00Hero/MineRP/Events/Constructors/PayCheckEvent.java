@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import x00Hero.MineRP.Player.RPlayer;
 
 public class PayCheckEvent extends Event {
-    private HandlerList handlerList = new HandlerList();
+    private static HandlerList handlerList = new HandlerList();
     private RPlayer rPlayer;
     private long amount;
     private int delay;
@@ -33,7 +33,7 @@ public class PayCheckEvent extends Event {
         return delay;
     }
 
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlerList;
     }
 

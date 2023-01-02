@@ -7,7 +7,11 @@ import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
 import x00Hero.MineRP.GUI.Constructors.MenuItemClickedEvent;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 public class MenuController {
+    private static HashMap<UUID, Menu> inMenu = new HashMap<>();
     
     @EventHandler
     public void MenuClicked(MenuItemClickedEvent event) {
@@ -22,5 +26,9 @@ public class MenuController {
             default:
                 break;
         }
+    }
+
+    public static void setInMenu(Player player, Menu menu) {
+        inMenu.put(player.getUniqueId(), menu);
     }
 }

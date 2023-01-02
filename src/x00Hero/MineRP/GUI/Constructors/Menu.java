@@ -5,8 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import x00Hero.MineRP.ChatController;
-import x00Hero.MineRP.GUI.Events.MenuController;
+import x00Hero.MineRP.Chat.ChatController;
+import x00Hero.MineRP.GUI.MenuController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -249,7 +249,7 @@ public class Menu {
         selPage = page;
         MenuPage menuPage = menuPages.get(page);
         menuPage.open(player);
-        MenuController.setMenu(player, this);
+        MenuController.setInMenu(player, this);
     }
 
     public void nextPage(Player player) {

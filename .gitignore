@@ -1,2 +1,4 @@
 .idea/
+out/*
 mineRP.iml
+*.class

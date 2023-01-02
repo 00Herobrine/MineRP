@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Job {
     private boolean isDefault = false;
     private boolean lostOnDeath = false;
+    private boolean voteRequired = false;
     private String jobID, jobName, jobTitle, jobDescription;
     private Material jobMaterial;
     private long wage;
@@ -92,6 +93,13 @@ public class Job {
     }
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public boolean isVoteRequired() {
+        return voteRequired;
+    }
+    public void setVoteRequired(boolean required) {
+        this.voteRequired = required;
     }
 
     public String getJobID() {

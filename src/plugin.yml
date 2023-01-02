@@ -2,6 +2,7 @@ name: MineRP
 main: x00Hero.MineRP.Main
 version: 0.1
 prefix: MineRP
+api-version: 1.19
 commands:
   jobs:
     description: "opens job menu"

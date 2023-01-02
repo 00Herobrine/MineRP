@@ -1,4 +1,4 @@
-package x00Hero.MineRP;
+package x00Hero.MineRP.Chat;
 
 import org.bukkit.entity.Player;
 

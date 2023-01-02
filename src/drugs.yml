@@ -1,0 +1,16 @@
+Growable:
+  weed:
+    name: "weed"
+    price: 25
+    stages:
+      1:
+        material: FLOWER_POT
+        length: 120
+      2:
+        material:
+        length:
+  mushroom:
+    name: "shroom spores"
+    price: 400
+    stages:
+      1:
