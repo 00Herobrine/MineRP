@@ -16,6 +16,8 @@ import static x00Hero.MineRP.Main.plugin;
 
 public class ChatController {
 
+
+
     public static void alertLoop() {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for(RPlayer rPlayer : Main.getRPlayers()) {
@@ -25,6 +27,7 @@ public class ChatController {
                     if(currentAlert == null) currentAlert = alerts.get(0);
                     if(currentAlert.getTimeElapsed() >= currentAlert.getLength()) {
                         alerts.remove(currentAlert);
+                        rPlayer.setCurrentAlert(null);
                     } else {
                         rPlayer.sendAlert(currentAlert.getMessage());
                         currentAlert.tick();
@@ -32,6 +35,17 @@ public class ChatController {
                 }
             }
         }, 20, 20);
+    }
+
+    public static void addAlert(RPlayer rPlayer, TimedAlert alert) {
+        ArrayList<TimedAlert> alerts = rPlayer.getTimedAlerts();
+        for (int i = 0; i < alerts.size(); i++) {
+            if (alerts.get(i).equals(alert)) {
+                alerts.remove(i);
+                break;
+            }
+        }
+        alerts.add(alert);
     }
 
     public static TextComponent getComponent(String message) {

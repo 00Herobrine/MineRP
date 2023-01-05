@@ -84,6 +84,16 @@ public class RPlayer {
         }
     }
 
+    public void addAlert(TimedAlert alert) {
+        ArrayList<TimedAlert> alerts = getTimedAlerts();
+        for (int i = 0; i < alerts.size(); i++) {
+            if (alerts.get(i).equals(alert)) {
+                alerts.remove(i);
+                break;
+            }
+        }
+        alerts.add(alert);
+    }
     public TimedAlert getCurrentAlert() {
         return currentAlert;
     }

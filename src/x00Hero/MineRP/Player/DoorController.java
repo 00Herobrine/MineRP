@@ -91,7 +91,7 @@ public class DoorController implements Listener {
             world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 1f); // not an owner, player knocking sound
         if(door.isLocked()) {
             TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 2);
-            rPlayer.addTimedAlert(alert);
+            rPlayer.addAlert(alert);
             e.getInteractEvent().setCancelled(true);
         }
     }
