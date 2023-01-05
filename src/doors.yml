@@ -1,0 +1,4 @@
+doors:
+  pd-door-1:
+    location: 71, 69, 420
+    price: 150

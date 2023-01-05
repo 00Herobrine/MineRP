@@ -46,10 +46,10 @@ public class Job {
         return max;
     }
 
-    public void setJobName(String jobName) {
+    public void setName(String jobName) {
         this.jobName = jobName;
     }
-    public String getJobName() {
+    public String getName() {
         return jobName;
     }
 

@@ -37,26 +37,6 @@ public class Menu {
         return (int) (Math.ceil((double) slots / 9)) * 9;
     }
 
-    public Menu(String title, ItemStack[] contents) {
-        int slots = Menu.getAdjustedAmount(contents.length);
-        MenuPage menuPage = new MenuPage(title, slots, false, false);
-        Inventory tempInv = Bukkit.createInventory(null, slots, title);
-        tempInv.setContents(contents);
-        int curSlot = 0;
-        for(ItemStack item : tempInv.getContents()) {
-            if(item != null && item.getType() != Material.AIR) {
-                int size = tempInv.getSize();
-                if(curSlot < size) {
-                    MenuItem menuItem = new MenuItem(item, curSlot);
-                    menuItem.setCancelClick(false);
-                    menuPage.addItem(menuItem);
-                }
-            }
-            curSlot++;
-        }
-        setPage(1, menuPage);
-    }
-
     public Menu(ArrayList<ItemStack> items, String title, String ID, boolean fillEmpty, boolean click) {
         selPage = 1;
         int curSlot = 0;
@@ -100,7 +80,48 @@ public class Menu {
         setPage(curPage, menuPage);
     }
 
-    public Menu(ArrayList<ItemStack> items, String title, boolean fillEmpty, boolean click) {
+    public Menu(ArrayList<MenuItem> items, String title, boolean fillEmpty, boolean cancelClick) {
+        selPage = 1;
+        int curSlot = 0;
+        int curPage = 1;
+        size = items.size();
+        rows = (int) Math.ceil((double) size / 9);
+        pages = (int) Math.ceil((double) size / 54);
+        if(pages > 1) {
+            // account for the next item and the previous item on first and last page + next/prev for each page between
+            int addition = (2 + (Math.abs(2 - pages) * 2));
+            size += addition;
+            rows = (int) Math.ceil((double) size / 9);
+            pages = (int) Math.ceil((double) rows / 6);
+        }
+        int subtract = 1;
+        MenuPage menuPage = new MenuPage(title, size, fillEmpty, cancelClick);
+        int prevSlot = MenuPage.prevPage.getSlot();
+        for(MenuItem menuItem : items) {
+            if(menuPages.containsKey(curPage)) menuPage = menuPages.get(curPage);
+            if(curSlot > maxSlot - subtract && pages != 1) {
+                if(curPage != pages) menuPage.addItem(MenuPage.nextPage);
+                setPage(curPage, menuPage);
+                curPage++;
+                curSlot = 0;
+                menuItem.setSlot(curSlot);
+                menuPage = new MenuPage(title + " Pg " + curPage, size, fillEmpty, cancelClick);
+            } else {
+                if(curSlot == prevSlot && curPage != 1) {
+                    menuPage.addItem(MenuPage.prevPage);
+                    curSlot++;
+                }
+                menuItem.setSlot(curSlot);
+            }
+            menuItem.setMenuPage(menuPage);
+            menuPage.addItem(menuItem);
+            curSlot++;
+        }
+        if(curPage == pages && curSlot < prevSlot && curPage != 1) menuPage.addItem(MenuPage.prevPage);
+        setPage(curPage, menuPage);
+    }
+
+/*    public Menu(ArrayList<ItemStack> items, String title, boolean fillEmpty, boolean click) {
         selPage = 1;
         int curSlot = 0;
         int curPage = 1;
@@ -141,9 +162,9 @@ public class Menu {
         }
         if(curPage == pages && curSlot < prevSlot && curPage != 1) menuPage.addItem(MenuPage.prevPage);
         setPage(curPage, menuPage);
-    }
+    }*/
 
-    public Menu(String title, ArrayList<MenuItem> menuItems, boolean fillEmpty, boolean cancelClicks) {
+/*    public Menu(String title, ArrayList<MenuItem> menuItems, boolean fillEmpty, boolean cancelClicks) {
         int lastSlot = 0;
         for(MenuItem item : menuItems) {
             int itemSlot = item.getSlot();
@@ -158,7 +179,7 @@ public class Menu {
             }
             menuPage.addItem(menuItem);
         }
-    }
+    }*/
 
     public void addPage(Integer pageNum, MenuPage menuPage) {
         menuPages.put(pageNum, menuPage);

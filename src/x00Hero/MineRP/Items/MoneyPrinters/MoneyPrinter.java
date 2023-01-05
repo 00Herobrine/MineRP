@@ -1,12 +1,20 @@
 package x00Hero.MineRP.Items.MoneyPrinters;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 
 public class MoneyPrinter {
     private boolean enabled;
     private Material material;
-    private int generateMin, generateMax, battery, maxBattery, interval, cashHolder, maxCash, printTime, price, limit;
+    private int generateMin, generateMax, battery, maxBattery, interval, cashHolder, maxCash, printTime, price, ownLimit;
     private String permission = null, name, lore;
+    private ItemStack itemStack = null;
+    private Location location;
+    private Hologram hologram;
 
     public MoneyPrinter() {
         material = Material.SMOOTH_STONE_SLAB;
@@ -39,7 +47,10 @@ public class MoneyPrinter {
     public void setGenerateMax(int generateMax) {
         this.generateMax = generateMax;
     }
-
+    
+    public void drainBattery(int amount) {
+        battery -= amount;
+    }
     public int getBattery() {
         return battery;
     }
@@ -74,11 +85,6 @@ public class MoneyPrinter {
         this.maxCash = maxCash;
     }
 
-    public void tick() {
-        int printTime = getPrintTime();
-        printTime--;
-        setPrintTime(printTime);
-    }
     public int getPrintTime() {
         return printTime;
     }
@@ -101,10 +107,10 @@ public class MoneyPrinter {
     }
 
     public int getOwnLimit() {
-        return limit;
+        return ownLimit;
     }
     public void setOwnLimit(int limit) {
-        this.limit = limit;
+        this.ownLimit = limit;
     }
 
     public boolean hasPermission() {
@@ -129,5 +135,40 @@ public class MoneyPrinter {
     }
     public void setLore(String lore) {
         this.lore = lore;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public int generateCash() {
+        return random(generateMin, generateMax);
+    }
+    public int random(int min, int max) {
+        return (int) (Math.floor(Math.random() * (max - min + 1)) + min); // The maximum is inclusive and the minimum is inclusive
+    }
+
+    public ItemStack getItemStack() {
+        if(itemStack == null) {
+            ItemBuilder itemBuilder = new ItemBuilder(material, name, lore);
+            itemStack = itemBuilder.getItemStack();
+        }
+        return itemStack;
+    }
+
+    public Hologram getHologram() {
+        return hologram;
+    }
+
+    public void createHologram() {
+        Hologram nHologram = new Hologram(location, name);
+        nHologram.addLine("Battery: ");
+    }
+
+    public void updatedDisplay() {
+        
     }
 }
