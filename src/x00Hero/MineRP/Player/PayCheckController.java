@@ -1,9 +1,8 @@
 package x00Hero.MineRP.Player;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import x00Hero.MineRP.Events.Constructors.PayCheckEvent;
+import x00Hero.MineRP.Events.Constructors.Player.PayCheckEvent;
 
 public class PayCheckController implements Listener {
 

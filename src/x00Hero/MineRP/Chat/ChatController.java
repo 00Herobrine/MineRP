@@ -8,15 +8,12 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.RPlayer;
-import x00Hero.MineRP.TimedAlert;
 
 import java.util.ArrayList;
 
 import static x00Hero.MineRP.Main.plugin;
 
 public class ChatController {
-
-
 
     public static void alertLoop() {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
@@ -35,17 +32,6 @@ public class ChatController {
                 }
             }
         }, 20, 20);
-    }
-
-    public static void addAlert(RPlayer rPlayer, TimedAlert alert) {
-        ArrayList<TimedAlert> alerts = rPlayer.getTimedAlerts();
-        for (int i = 0; i < alerts.size(); i++) {
-            if (alerts.get(i).equals(alert)) {
-                alerts.remove(i);
-                break;
-            }
-        }
-        alerts.add(alert);
     }
 
     public static TextComponent getComponent(String message) {
@@ -70,7 +56,7 @@ public class ChatController {
         player.sendMessage(message);
     }
 
-    public static void sendMessage(Player player, int id) {
+    public static void sendMessage(Player player, int id) { // lang file shit
 
     }
 

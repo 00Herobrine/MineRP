@@ -4,9 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import x00Hero.MineRP.Events.Constructors.PayCheckEvent;
+import x00Hero.MineRP.Events.Constructors.Player.PayCheckEvent;
+import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
+import x00Hero.MineRP.GUI.Constructors.Menu;
+import x00Hero.MineRP.GUI.Constructors.MenuItem;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -32,7 +36,7 @@ public class JobController implements Listener {
             if(jobSettings.contains("max")) job.setMax(jobSettings.getInt("max"));
             if(jobSettings.contains("material")) {
                 Material material = Material.valueOf(jobSettings.getString("material"));
-                job.setJobMaterial(material);
+                job.setMaterial(material);
             }
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
@@ -71,5 +75,24 @@ public class JobController implements Listener {
 
     public static Job getJob(String name) {
         return jobs.get(name);
+    }
+
+    public static void JobMenu(Player player) {
+        ArrayList<MenuItem> menuItems = new ArrayList<>();
+        for(Job job :  getJobs().values()) {
+            Material material = job.getMaterial();
+            String name = job.getName();
+            String description = job.getDescription();
+            description = description.replace("{count}", "1").replace("{max}", job.getMax() + "");
+            ItemBuilder itemBuilder = new ItemBuilder(material, name, description);
+            MenuItem menuItem = new MenuItem(itemBuilder.getItemStack(), "menu-job-" + job.getID());
+            menuItems.add(menuItem);
+        }
+        Menu jobMenu = new Menu(menuItems,"Available Jobs", true, true);
+        jobMenu.openMenu(player);
+    }
+
+    public static YamlConfiguration getJobsConfig() {
+        return YamlConfiguration.loadConfiguration(jobsFile);
     }
 }

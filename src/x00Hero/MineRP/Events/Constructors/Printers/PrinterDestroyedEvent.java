@@ -1,4 +1,4 @@
-package x00Hero.MineRP.Events.Constructors;
+package x00Hero.MineRP.Events.Constructors.Printers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

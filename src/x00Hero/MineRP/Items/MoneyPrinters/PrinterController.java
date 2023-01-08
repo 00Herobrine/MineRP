@@ -6,9 +6,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import x00Hero.MineRP.Events.Constructors.PrinterCreateEvent;
-import x00Hero.MineRP.Events.Constructors.PrinterPrintEvent;
-import x00Hero.MineRP.Events.Constructors.PrinterTickEvent;
+import x00Hero.MineRP.Events.Constructors.Printers.PrinterCreateEvent;
+import x00Hero.MineRP.Events.Constructors.Printers.PrinterPrintEvent;
+import x00Hero.MineRP.Events.Constructors.Printers.PrinterTickEvent;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
 

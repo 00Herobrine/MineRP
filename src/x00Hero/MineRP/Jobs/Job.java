@@ -1,6 +1,8 @@
 package x00Hero.MineRP.Jobs;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 
@@ -8,18 +10,18 @@ public class Job {
     private boolean isDefault = false;
     private boolean lostOnDeath = false;
     private boolean voteRequired = false;
-    private String jobID, jobName, jobTitle, jobDescription;
-    private Material jobMaterial;
+    private String ID, name, title, description;
+    private Material material;
     private long wage;
     private int interval, max;
     private ArrayList<JobItem> jobItems = new ArrayList<>();
 
     public Job(String jobID) {
-        this.jobID = jobID;
-        jobName = "Citizen";
-        jobTitle = "Cunt";
-        jobDescription = "Test Description";
-        jobMaterial = Material.PAPER;
+        ID = jobID;
+        name = "Citizen";
+        title = "Cunt";
+        description = "Test Description";
+        material = Material.PAPER;
         wage = 10;
         interval = 600;
         max = -1; // means uncapped
@@ -46,32 +48,32 @@ public class Job {
         return max;
     }
 
-    public void setName(String jobName) {
-        this.jobName = jobName;
+    public void setName(String name) {
+        this.name = name;
     }
     public String getName() {
-        return jobName;
+        return name;
     }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobDescription(String jobDescription) {
-        this.jobDescription = jobDescription;
-    }
-    public String getJobDescription() {
-        return jobDescription;
+    public String getTitle() {
+        return title;
     }
 
-    public void setJobMaterial(Material jobMaterial) {
-        this.jobMaterial = jobMaterial;
+    public void setDescription(String description) {
+        this.description = description;
     }
-    public Material getJobMaterial() {
-        return jobMaterial;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+    public Material getMaterial() {
+        return material;
     }
 
     public boolean isLostOnDeath() {
@@ -102,11 +104,23 @@ public class Job {
         this.voteRequired = required;
     }
 
-    public String getJobID() {
-        return jobID;
+    public String getID() {
+        return ID;
     }
 
     public boolean isLimited() {
         return max != -1;
+    }
+
+    public void loadConfig() {
+        YamlConfiguration configFile = JobController.getJobsConfig();
+        ConfigurationSection config = configFile.getConfigurationSection("jobs." + getID());
+        Material material = Material.valueOf(config.getString("material"));
+        setMaterial(material);
+        setTitle(config.getString("title"));
+        setName(config.getString("name"));
+        setDescription(config.getString("description"));
+        setMax(config.getInt("max"));
+        setWage(config.getInt("wage"));
     }
 }

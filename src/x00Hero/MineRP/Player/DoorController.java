@@ -7,14 +7,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import x00Hero.MineRP.Events.Constructors.DoorInteractEvent;
+import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.Items.Generic.OwnableDoor;
 import x00Hero.MineRP.Jobs.JobItem;
-import x00Hero.MineRP.TimedAlert;
+import x00Hero.MineRP.Chat.TimedAlert;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,13 +43,16 @@ public class DoorController implements Listener {
             OwnableDoor ownableDoor = new OwnableDoor(location);
             if(door.contains("price")) ownableDoor.setPrice(door.getInt("price"));
             if(door.contains("locked")) ownableDoor.setLocked(door.getBoolean("locked"));
+            if(door.contains("sound-lock")) ownableDoor.setVolume(door.getInt("volume"));
+            if(door.contains("lockpick-time")) ownableDoor.setDefaultLockPickTime(door.getInt("lockpick-time"));
+            if(door.contains("lockpick-volume")) ownableDoor.setLockPickVolume(door.getInt("lockpick-volume"));
             cachedDoors.put(location, ownableDoor);
         }
     }
 
     @EventHandler
     public void DoorInteract(DoorInteractEvent e) {
-        RPlayer rPlayer = e.getPlayer();
+        RPlayer rPlayer = e.getRPlayer();
         Player player = rPlayer.getPlayer();
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         OwnableDoor door = e.getDoor();
@@ -87,11 +87,11 @@ public class DoorController implements Listener {
                     return;
                 }
             }
-        } else if(door.isLocked())
-            world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 1f); // not an owner, player knocking sound
+        }
         if(door.isLocked()) {
-            TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 2);
-            rPlayer.addAlert(alert);
+            world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.7f, 1f); // not an owner, player knocking sound
+            TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 3);
+            if(rightClick) rPlayer.addAlert(alert);
             e.getInteractEvent().setCancelled(true);
         }
     }

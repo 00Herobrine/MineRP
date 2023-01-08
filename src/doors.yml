@@ -2,3 +2,7 @@ doors:
   pd-door-1:
     location: 71, 69, 420
     price: 150
+    volume: 0.7 # optional
+    #lockpick-time: 10 # optional
+    #lockpick-volume 1.0 # optional
+    #locked: false # optional

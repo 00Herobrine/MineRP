@@ -10,7 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import x00Hero.MineRP.Events.Constructors.DoorInteractEvent;
+import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
+import x00Hero.MineRP.Events.Constructors.Player.LockPickDoorEvent;
 import x00Hero.MineRP.Items.Generic.OwnableDoor;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.DoorController;
@@ -35,9 +36,12 @@ public class InteractEvent implements Listener {
                 OwnableDoor door = DoorController.getDoor(loc);
                 boolean rightClick = e.getAction() == Action.RIGHT_CLICK_BLOCK;
                 RPlayer rPlayer = Main.getRPlayer(e.getPlayer());
-                ItemStack heldItem = rPlayer.getPlayer().getInventory().getItemInMainHand();
-                boolean isKeys = false;
-                Bukkit.getPluginManager().callEvent(new DoorInteractEvent(rPlayer, door, rightClick, isKeys, e));
+                ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
+                if(heldItem.getType() != Material.AIR && getTags(heldItem).equalsIgnoreCase("lockpick")) {
+                    Bukkit.getPluginManager().callEvent(new LockPickDoorEvent(rPlayer, door, e));
+                    return;
+                }
+                Bukkit.getPluginManager().callEvent(new DoorInteractEvent(rPlayer, door, rightClick, e));
             }
         }
     }
