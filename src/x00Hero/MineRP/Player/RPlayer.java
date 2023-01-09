@@ -34,19 +34,15 @@ public class RPlayer {
     public boolean isInJail() {
         return inJail;
     }
-
     public void setInJail(boolean inJail) {
         this.inJail = inJail;
     }
-
     public long getReleaseTime() {
         return releaseTime;
     }
-
     public void setReleaseTime(long releaseTime) {
         this.releaseTime = releaseTime;
     }
-
     //endregion
     public boolean isWanted() {
         return wanted;

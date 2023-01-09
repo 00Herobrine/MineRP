@@ -11,6 +11,7 @@ import x00Hero.MineRP.Events.Constructors.Player.PayCheckEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
+import x00Hero.MineRP.Items.Generic.Lockpick;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -32,6 +33,7 @@ public class JobController implements Listener {
         for(String jobID : jobsConfig.getConfigurationSection("jobs").getKeys(false)) {
             ConfigurationSection jobSettings = jobsConfig.getConfigurationSection("jobs." + jobID);
             Job job = new Job(jobID);
+            job.addJobItem(Lockpick.lockpick);
             if(jobSettings.contains("wage")) job.setWage(jobSettings.getInt("wage"));
             if(jobSettings.contains("max")) job.setMax(jobSettings.getInt("max"));
             if(jobSettings.contains("material")) {
@@ -41,6 +43,7 @@ public class JobController implements Listener {
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
         }
+        defaultItems.add(Lockpick.lockpick);
         defaultItems.add(DoorController.keys);
     }
 

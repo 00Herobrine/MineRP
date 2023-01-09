@@ -5,7 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import x00Hero.MineRP.Main;
-import x00Hero.MineRP.Player.RPlayer;
 
 public class PlayerJoin implements Listener {
 

@@ -1,18 +1,32 @@
 package x00Hero.MineRP.Items.Generic;
 
 public class LockPickStat {
-    private long lastPicked, finish;
+    private int elapsed = 0;
+    private long lastPicked;
+    private final long startTime, finishTime;
 
-    public LockPickStat(long lastPicked, long finish) {
-        this.lastPicked = lastPicked;
-        this.finish = finish;
+    public LockPickStat(long currentTime, long finishTime) {
+        this.lastPicked = currentTime;
+        this.startTime = currentTime;
+        this.finishTime = finishTime;
     }
 
-    public long getFinish() {
-        return finish;
+    public void tick() {
+        lastPicked = System.currentTimeMillis();
+        elapsed++;
     }
-    public void setFinish(long finish) {
-        this.finish = finish;
+    public int getElapsed() {
+        return elapsed;
+    }
+    public void setElapsed(int elapsed) {
+        this.elapsed = elapsed;
+    }
+
+    public long getFinishTime() {
+        return finishTime;
+    }
+    public long getStartTime() {
+        return startTime;
     }
 
     public long getLastPicked() {

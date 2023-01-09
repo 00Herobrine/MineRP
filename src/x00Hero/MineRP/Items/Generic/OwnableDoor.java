@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class OwnableDoor {
+    //region variables
     private Location location;
     private UUID owner;
     private ArrayList<UUID> owners = new ArrayList<>();
@@ -18,12 +19,16 @@ public class OwnableDoor {
     private float volume, lockPickVolume;
     private boolean locked;
     private HashMap<UUID, LockPickStat> lockpickers = new HashMap<>();
+    //endregion
 
     public OwnableDoor(Location location) {
         this.location = location;
         this.locked = false;
         this.volume = 0.7f;
         this.lockPickVolume = 1f;
+        this.defaultLockPickTime = 5;
+        this.lockSound = Sound.BLOCK_CHAIN_BREAK;
+        this.unlockSound = Sound.BLOCK_CHAIN_PLACE;
     }
 
     //region General
@@ -33,33 +38,41 @@ public class OwnableDoor {
     public void setLocation(Location location) {
         this.location = location;
     }
-
     public float getVolume() {
         return volume;
     }
     public void setVolume(float volume) {
         this.volume = volume;
     }
-
     public int getPrice() {
         return price;
     }
     public void setPrice(int price) {
         this.price = price;
     }
-
     public int getSellFee() {
         return sellFee;
     }
     public void setSellFee(int sellFee) {
         this.sellFee = sellFee;
     }
-
     public boolean isLocked() {
         return locked;
     }
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+    public Sound getLockSound() {
+        return lockSound;
+    }
+    public void setLockSound(Sound lockSound) {
+        this.lockSound = lockSound;
+    }
+    public Sound getUnlockSound() {
+        return unlockSound;
+    }
+    public void setUnlockSound(Sound unlockSound) {
+        this.unlockSound = unlockSound;
     }
     //endregion
 
@@ -84,16 +97,12 @@ public class OwnableDoor {
     }
     //endregion
 
-    //region lockPicking
+    //region LockPicking
     public LockPickStat getLockStat(UUID uuid) {
         return lockpickers.get(uuid);
     }
-    public long getLockPickFinish(UUID uuid) {
-        return lockpickers.get(uuid).getFinish();
-    }
     public void setLockPickFinish(UUID uuid, int time) {
         LockPickStat lockStat = getLockStat(uuid);
-        lockStat.setFinish(time);
         lockpickers.put(uuid, lockStat);
     }
     public int getDefaultLockPickTime() {

@@ -89,6 +89,9 @@ public class Job {
     public ArrayList<JobItem> getJobItems() {
         return jobItems;
     }
+    public void addJobItem(JobItem jobItem) {
+        jobItems.add(jobItem);
+    }
 
     public boolean isDefault() {
         return isDefault;

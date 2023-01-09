@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import x00Hero.MineRP.Chat.ChatController;
 import x00Hero.MineRP.Events.DefaultMC.InteractEvent;
 import x00Hero.MineRP.Events.DefaultMC.PlayerJoin;
+import x00Hero.MineRP.Items.Generic.Lockpick;
 import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Player.DoorController;
@@ -52,12 +53,14 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new PayCheckController(), this);
         pm.registerEvents(new DoorController(), this);
         pm.registerEvents(new JobController(), this);
+        pm.registerEvents(new Lockpick(), this);
     }
 
     public void registerLoops() {
         JobController.paycheckLoop();
         PrinterController.printerLoop();
         ChatController.alertLoop();
+        Lockpick.lockPickLoop();
     }
 
     public static ArrayList<RPlayer> getRPlayers() {

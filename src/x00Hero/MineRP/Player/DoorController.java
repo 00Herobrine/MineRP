@@ -43,7 +43,8 @@ public class DoorController implements Listener {
             OwnableDoor ownableDoor = new OwnableDoor(location);
             if(door.contains("price")) ownableDoor.setPrice(door.getInt("price"));
             if(door.contains("locked")) ownableDoor.setLocked(door.getBoolean("locked"));
-            if(door.contains("sound-lock")) ownableDoor.setVolume(door.getInt("volume"));
+            if(door.contains("sound-lock")) ownableDoor.setLockSound(Sound.valueOf(door.getString("sound-lock")));
+            if(door.contains("sound-unlock")) ownableDoor.setUnlockSound(Sound.valueOf(door.getString("sound-unlock")));
             if(door.contains("lockpick-time")) ownableDoor.setDefaultLockPickTime(door.getInt("lockpick-time"));
             if(door.contains("lockpick-volume")) ownableDoor.setLockPickVolume(door.getInt("lockpick-volume"));
             cachedDoors.put(location, ownableDoor);
@@ -76,6 +77,7 @@ public class DoorController implements Listener {
                     e.getInteractEvent().setCancelled(true);
                     door.setLocked(true);
                     rPlayer.sendAlert("Door &cLocked&r!", Sound.BLOCK_BAMBOO_SAPLING_BREAK, 1f, 0.7f);
+                    location.getWorld().playSound(location, door.getLockSound(), 1f, 1f);
                     return;
                 } else {
                     door.setLocked(false);
@@ -84,6 +86,7 @@ public class DoorController implements Listener {
                         return;
                     }
                     rPlayer.sendAlert("Door &aUnlocked&r!");
+                    location.getWorld().playSound(location, door.getUnlockSound(), 1f, 1f);
                     return;
                 }
             }

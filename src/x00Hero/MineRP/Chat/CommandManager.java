@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import x00Hero.MineRP.Jobs.JobController;
 
 public class CommandManager implements CommandExecutor, Listener {
 
@@ -14,6 +15,7 @@ public class CommandManager implements CommandExecutor, Listener {
         Player player = (Player) sender;
         switch(command.getLabel().toLowerCase()) {
             case "jobs":
+                JobController.JobMenu(player);
                 break;
             case "menu":
                 break;
