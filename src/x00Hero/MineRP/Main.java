@@ -37,21 +37,22 @@ public class Main extends JavaPlugin {
         registerLoops();
         registerCommands();
         getLogger().info("Enabled " + getDescription().getFullName());
+    }
+
+    public static void cacheConfigs() {
+        JobController.cacheJobs();
+        PrinterController.cachePrinters();
+        DoorController.cacheDoors();
+        ChatController.cacheMessages();
         for(Player player : Bukkit.getOnlinePlayers()) {
             createRPlayer(player);
         }
     }
 
-    public void cacheConfigs() {
-        JobController.cacheJobs();
-        PrinterController.cachePrinters();
-        DoorController.cacheDoors();
-        ChatController.cacheMessages();
-    }
-
     public void registerCommands() {
         getCommand("/").setExecutor(new CommandManager());
         getCommand("advert").setExecutor(new CommandManager());
+        getCommand("minerp").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
@@ -65,7 +66,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new CommandManager(), this);
     }
 
-    public void registerLoops() {
+    public static void registerLoops() {
         JobController.paycheckLoop();
         PrinterController.printerLoop();
         ChatController.alertLoop();

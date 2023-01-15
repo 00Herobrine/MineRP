@@ -34,15 +34,9 @@ public class JobController implements Listener {
         YamlConfiguration jobsConfig = YamlConfiguration.loadConfiguration(jobsFile);
         plugin.getLogger().info(jobsFile.getAbsolutePath() + " exists " + jobsFile.exists());
         for(String jobID : jobsConfig.getConfigurationSection("jobs").getKeys(false)) {
-            ConfigurationSection jobSettings = jobsConfig.getConfigurationSection("jobs." + jobID);
             Job job = new Job(jobID);
             job.addJobItem(Lockpick.lockpick);
-            if(jobSettings.contains("wage")) job.setWage(jobSettings.getInt("wage"));
-            if(jobSettings.contains("max")) job.setMax(jobSettings.getInt("max"));
-            if(jobSettings.contains("material")) {
-                Material material = Material.valueOf(jobSettings.getString("material"));
-                job.setMaterial(material);
-            }
+            job.loadConfig();
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
         }

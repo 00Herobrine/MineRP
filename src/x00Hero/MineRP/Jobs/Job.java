@@ -10,7 +10,8 @@ public class Job {
     private boolean isDefault = false;
     private boolean lostOnDeath = false;
     private boolean voteRequired = false;
-    private String ID, name, title, description;
+    private final String ID;
+    private String name, title, description;
     private Material material;
     private long wage;
     private int interval, max;
@@ -19,7 +20,7 @@ public class Job {
     public Job(String jobID) {
         ID = jobID;
         name = "Citizen";
-        title = "Cunt";
+        title = "&7[&r" + name + "&7]";
         description = "Test Description";
         material = Material.PAPER;
         wage = 10;
@@ -118,12 +119,19 @@ public class Job {
     public void loadConfig() {
         YamlConfiguration configFile = JobController.getJobsConfig();
         ConfigurationSection config = configFile.getConfigurationSection("jobs." + getID());
-        Material material = Material.valueOf(config.getString("material"));
-        setMaterial(material);
-        setTitle(config.getString("title"));
-        setName(config.getString("name"));
-        setDescription(config.getString("description"));
-        setMax(config.getInt("max"));
-        setWage(config.getInt("wage"));
+        assert config != null;
+        if(config.contains("title")) setTitle(config.getString("title"));
+        if(config.contains("name")) setName(config.getString("name"));
+        if(config.contains("description")) setDescription(config.getString("description"));
+        if(config.contains("max")) setMax(config.getInt("max"));
+        if(config.contains("wage")) setWage(config.getInt("wage"));
+        if(config.contains("default")) setDefault(config.getBoolean("default"));
+        if(config.contains("lostOnDeath")) setLostOnDeath(config.getBoolean("lostOnDeath"));
+        if(config.contains("interval")) setInterval(config.getInt("interval"));
+        if(config.contains("voted")) setVoteRequired(config.getBoolean("voted"));
+        if(config.contains("material")) {
+            Material material = Material.valueOf(config.getString("material"));
+            setMaterial(material);
+        }
     }
 }

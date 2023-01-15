@@ -14,6 +14,7 @@ import x00Hero.MineRP.Player.RPlayer;
 
 import java.util.ArrayList;
 
+import static x00Hero.MineRP.Main.getRPlayer;
 import static x00Hero.MineRP.Main.plugin;
 
 public class ChatController implements Listener {
@@ -28,11 +29,17 @@ public class ChatController implements Listener {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for(RPlayer rPlayer : Main.getRPlayers()) {
                 ArrayList<TimedAlert> alerts = rPlayer.getTimedAlerts();
+//                if(rPlayer.getCurrentAlert() == null) rPlayer.setCurrentAlert(alerts.get(0));
                 TimedAlert currentAlert = rPlayer.getCurrentAlert();
                 if(alerts.size() > 0) {
-                    if(currentAlert == null) currentAlert = alerts.get(0);
+                    if(currentAlert == null) {
+                        TimedAlert firstAlert = alerts.get(0);
+                        alerts.remove(firstAlert);
+                        currentAlert = firstAlert;
+                        rPlayer.setCurrentAlert(firstAlert);
+                    }
                     if(currentAlert.getTimeElapsed() >= currentAlert.getLength()) {
-                        alerts.remove(currentAlert);
+//                        alerts.remove(currentAlert);
                         rPlayer.setCurrentAlert(null);
                     } else {
                         rPlayer.sendAlert(currentAlert.getMessage());
@@ -47,6 +54,7 @@ public class ChatController implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         String message = e.getMessage();
         Player player = e.getPlayer();
+        RPlayer rPlayer = getRPlayer(player);
         e.setCancelled(true);
         int distance = 7;
         if(message.startsWith("!")) {
@@ -55,7 +63,8 @@ public class ChatController implements Listener {
         }
         for(Player recipient : e.getRecipients()) {
             if(recipient.getLocation().distance(player.getLocation()) <= distance) {
-                recipient.sendMessage(player.getName() + ": " + message);
+                String jobTitle = ChatColor.translateAlternateColorCodes('&', rPlayer.getJob().getTitle() + "&r ");
+                recipient.sendMessage(jobTitle + player.getName() + ": " + message);
             }
         }
     }

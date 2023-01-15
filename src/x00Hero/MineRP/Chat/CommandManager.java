@@ -10,14 +10,25 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import x00Hero.MineRP.Jobs.JobController;
+import x00Hero.MineRP.Player.RPlayer;
+
+import static x00Hero.MineRP.Main.cacheConfigs;
+import static x00Hero.MineRP.Main.getRPlayer;
 
 public class CommandManager implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String cmdLabel, String[] args) {
         Player player = (Player) sender;
+        RPlayer rPlayer = getRPlayer(player);
         String label = command.getLabel().toLowerCase();
         switch(label) {
+            case "minerp":
+                if(args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+                    rPlayer.sendMessage("Configs reloaded.");
+                    cacheConfigs();
+                }
+                break;
             case "jobs":
                 JobController.JobMenu(player);
                 break;

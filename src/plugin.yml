@@ -11,3 +11,5 @@ commands:
   advert:
     description: "Post an in-game advert"
     aliases: [ad, adv]
+  minerp:
+    description: "Main command"
