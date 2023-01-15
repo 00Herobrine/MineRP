@@ -4,8 +4,9 @@ import org.bukkit.Sound;
 
 public class TimedAlert {
 
-    private String message;
-    private int length, timeElapsed;
+    private final String message;
+    private final int length;
+    private int timeElapsed = 0;
     private Sound sound = null;
     private float loudness = 1f, speed = 1f;
 

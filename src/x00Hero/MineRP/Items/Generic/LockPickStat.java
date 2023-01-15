@@ -1,9 +1,9 @@
 package x00Hero.MineRP.Items.Generic;
 
 public class LockPickStat {
-    private int elapsed = 0;
-    private long lastPicked;
-    private final long startTime, finishTime;
+    private long lastPicked, nextSoundTime;
+    private final long startTime, finishTime, soundInterval = 1000; // in ms
+    private boolean alerted = false;
 
     public LockPickStat(long currentTime, long finishTime) {
         this.lastPicked = currentTime;
@@ -13,13 +13,13 @@ public class LockPickStat {
 
     public void tick() {
         lastPicked = System.currentTimeMillis();
-        elapsed++;
     }
-    public int getElapsed() {
-        return elapsed;
+
+    public boolean isAlerted() {
+        return alerted;
     }
-    public void setElapsed(int elapsed) {
-        this.elapsed = elapsed;
+    public void setAlerted(boolean alerted) {
+        this.alerted = alerted;
     }
 
     public long getFinishTime() {

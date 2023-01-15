@@ -23,27 +23,22 @@ import java.util.UUID;
 import static x00Hero.MineRP.Main.plugin;
 
 public class Lockpick implements Listener {
-    private static ItemBuilder lockpickBuilder = new ItemBuilder(Material.STICK, "Lockpick", "A universal key if you know how to use it.", "lockpick");
-    private static ItemStack lockpickItem = lockpickBuilder.getItemStack();
+    private static final ItemBuilder lockpickBuilder = new ItemBuilder(Material.STICK, "Lockpick", "A universal key if you know how to use it.", "lockpick");
+    private static final ItemStack lockpickItem = lockpickBuilder.getItemStack();
     public static JobItem lockpick = new JobItem(lockpickItem, 6);
-    private static ArrayList<Location> lockpicking = new ArrayList<>(); // doors being lockpicked
-    private static HashMap<UUID, Long> cooldowns = new HashMap<>();
-    private static int timeout = 250;
+    private static final ArrayList<Location> lockpicking = new ArrayList<>(); // doors being lockpicked
+    private static final HashMap<UUID, Long> cooldowns = new HashMap<>();
+    private static final int timeout = 250;
 
     public String getProgressBar(int current, int max, int totalBars, String symbol, String completedColor, String notCompletedColor) {
         float percent = (float) current / max;
         int progressBars = (int) (totalBars * percent);
         int leftOver = (totalBars - progressBars);
-        StringBuilder sb = new StringBuilder();
-        sb.append(ChatColor.translateAlternateColorCodes('&', completedColor));
-        for(int i = 0; i < progressBars; i++) {
-            sb.append(symbol);
-        }
-        sb.append(ChatColor.translateAlternateColorCodes('&', notCompletedColor));
-        for(int i = 0; i < leftOver; i++) {
-            sb.append(symbol);
-        }
-        return sb.toString();
+        String sb = ChatColor.translateAlternateColorCodes('&', completedColor) +
+                String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
+                ChatColor.translateAlternateColorCodes('&', notCompletedColor) +
+                String.valueOf(symbol).repeat(Math.max(0, leftOver));
+        return sb;
     }
 
     public static void addCooldown(UUID uuid) {
@@ -94,10 +89,15 @@ public class Lockpick implements Listener {
         UUID playerID = player.getUniqueId();
         OwnableDoor door = e.getDoor();
         LockPickStat lockStat = door.getLockPickStat(playerID);
+        e.getInteractEvent().setCancelled(true);
         if(!cooldowns.containsKey(playerID)) {
             if(!door.isLockPicking(playerID)) { // hasn't started picking yet
                 startLockPicking(door, playerID);
                 lockStat = door.getLockStat(playerID);
+            }
+            if(!player.isSneaking() && !lockStat.isAlerted()) {
+                rPlayer.sendMessage("Sneaking is advised to avoid the client door noise.");
+                lockStat.setAlerted(true);
             }
             long curTime = System.currentTimeMillis();
             long lastInteractTime = lockStat.getLastPicked();
@@ -116,6 +116,7 @@ public class Lockpick implements Listener {
             } else if(curTime > lockStat.getFinishTime()) {
                 // Lockpicking has finished
                 rPlayer.sendAlert("Door picked open.");
+                door.playSound(door.getUnlockSound(), door.getVolume(), 1f);
                 door.finishLockPicking(playerID); // remove the lockpicker for this player
                 door.setLocked(false);
                 lockpicking.remove(door.getLocation());

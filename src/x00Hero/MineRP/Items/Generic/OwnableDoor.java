@@ -15,7 +15,7 @@ public class OwnableDoor {
     private UUID owner;
     private ArrayList<UUID> owners = new ArrayList<>();
     private int defaultLockPickTime, price, sellFee;
-    private Sound lockSound, unlockSound;
+    private Sound lockSound, unlockSound, lockpickSound;
     private float volume, lockPickVolume;
     private boolean locked;
     private HashMap<UUID, LockPickStat> lockpickers = new HashMap<>();
@@ -29,6 +29,7 @@ public class OwnableDoor {
         this.defaultLockPickTime = 5;
         this.lockSound = Sound.BLOCK_CHAIN_BREAK;
         this.unlockSound = Sound.BLOCK_CHAIN_PLACE;
+        this.lockpickSound = Sound.ITEM_ARMOR_EQUIP_IRON;
     }
 
     //region General
@@ -73,6 +74,12 @@ public class OwnableDoor {
     }
     public void setUnlockSound(Sound unlockSound) {
         this.unlockSound = unlockSound;
+    }
+    public Sound getLockpickSound() {
+        return lockpickSound;
+    }
+    public void setLockpickSound(Sound lockpickSound) {
+        this.lockpickSound = lockpickSound;
     }
     //endregion
 
@@ -138,4 +145,8 @@ public class OwnableDoor {
         return lockpickers;
     }
     //endregion
+
+    public void playSound(Sound sound, float volume, float speed) {
+        location.getWorld().playSound(location, sound, volume, speed);
+    }
 }

@@ -10,14 +10,15 @@ import x00Hero.MineRP.Player.RPlayer;
 public class DoorInteractEvent extends Event {
     private RPlayer player;
     private OwnableDoor door;
-    private boolean rightClick;
+    private boolean rightClick, keys;
     private static HandlerList handlerList = new HandlerList();
     private PlayerInteractEvent interactEvent;
 
-    public DoorInteractEvent(RPlayer player, OwnableDoor door, boolean rightClick, PlayerInteractEvent interactEvent) {
+    public DoorInteractEvent(RPlayer player, OwnableDoor door, boolean rightClick, boolean keys, PlayerInteractEvent interactEvent) {
         this.player = player;
         this.door = door;
         this.rightClick = rightClick;
+        this.keys = keys;
         this.interactEvent = interactEvent;
     }
 
@@ -35,6 +36,9 @@ public class DoorInteractEvent extends Event {
 
     public boolean isRightClick() {
         return rightClick;
+    }
+    public boolean isKeys() {
+        return keys;
     }
 
     public PlayerInteractEvent getInteractEvent() {

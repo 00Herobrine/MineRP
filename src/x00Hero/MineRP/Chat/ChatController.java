@@ -6,6 +6,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -13,7 +16,13 @@ import java.util.ArrayList;
 
 import static x00Hero.MineRP.Main.plugin;
 
-public class ChatController {
+public class ChatController implements Listener {
+
+    private static String prefix;
+
+    public static void cacheMessages() {
+        prefix = plugin.getConfig().getString("prefix");
+    }
 
     public static void alertLoop() {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
@@ -32,6 +41,23 @@ public class ChatController {
                 }
             }
         }, 20, 20);
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent e) {
+        String message = e.getMessage();
+        Player player = e.getPlayer();
+        e.setCancelled(true);
+        int distance = 7;
+        if(message.startsWith("!")) {
+            message = message.replaceFirst("!", "");
+            distance = 15;
+        }
+        for(Player recipient : e.getRecipients()) {
+            if(recipient.getLocation().distance(player.getLocation()) <= distance) {
+                recipient.sendMessage(player.getName() + ": " + message);
+            }
+        }
     }
 
     public static TextComponent getComponent(String message) {
@@ -53,7 +79,8 @@ public class ChatController {
     }
 
     public static void sendMessage(Player player, String message) {
-        player.sendMessage(message);
+        String msg = prefix + message;
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
     }
 
     public static void sendMessage(Player player, int id) { // lang file shit

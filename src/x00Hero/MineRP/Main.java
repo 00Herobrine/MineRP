@@ -11,6 +11,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import x00Hero.MineRP.Chat.ChatController;
+import x00Hero.MineRP.Chat.CommandManager;
 import x00Hero.MineRP.Events.DefaultMC.InteractEvent;
 import x00Hero.MineRP.Events.DefaultMC.PlayerJoin;
 import x00Hero.MineRP.Items.Generic.Lockpick;
@@ -21,19 +22,20 @@ import x00Hero.MineRP.Player.PayCheckController;
 import x00Hero.MineRP.Player.RPlayer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class Main extends JavaPlugin {
     public static Plugin plugin;
     private static HashMap<UUID, RPlayer> players = new HashMap<>();
+    public static final PluginManager pm = Bukkit.getPluginManager();
 
     public void onEnable() {
         plugin = this;
         registerEvents();
         cacheConfigs();
         registerLoops();
+        registerCommands();
         getLogger().info("Enabled " + getDescription().getFullName());
         for(Player player : Bukkit.getOnlinePlayers()) {
             createRPlayer(player);
@@ -44,16 +46,23 @@ public class Main extends JavaPlugin {
         JobController.cacheJobs();
         PrinterController.cachePrinters();
         DoorController.cacheDoors();
+        ChatController.cacheMessages();
+    }
+
+    public void registerCommands() {
+        getCommand("/").setExecutor(new CommandManager());
+        getCommand("advert").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
-        PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new InteractEvent(), this);
         pm.registerEvents(new PlayerJoin(), this);
         pm.registerEvents(new PayCheckController(), this);
         pm.registerEvents(new DoorController(), this);
         pm.registerEvents(new JobController(), this);
         pm.registerEvents(new Lockpick(), this);
+        pm.registerEvents(new ChatController(), this);
+        pm.registerEvents(new CommandManager(), this);
     }
 
     public void registerLoops() {
@@ -66,15 +75,12 @@ public class Main extends JavaPlugin {
     public static ArrayList<RPlayer> getRPlayers() {
         return new ArrayList<>(players.values());
     }
-
     public static HashMap<UUID, RPlayer> getPlayers() {
         return players;
     }
-
     public static RPlayer getRPlayer(Player player) {
         return getRPlayer(player.getUniqueId());
     }
-
     public static RPlayer getRPlayer(UUID uuid) {
         return players.get(uuid);
     }
@@ -88,10 +94,12 @@ public class Main extends JavaPlugin {
         addRPlayer(rPlayer);
     }
 
+    public static boolean hasTags(ItemStack itemStack, String tag) {
+        return getStoredString(itemStack, "tag").equalsIgnoreCase(tag);
+    }
     public static String getTags(ItemStack itemStack) {
         return getStoredString(itemStack, "tag");
     }
-
     public static String getStoredString(ItemStack item, String key) {
         NamespacedKey namespacedKey = new NamespacedKey(plugin, key);
         ItemMeta itemMeta = item.getItemMeta();

@@ -6,3 +6,8 @@ api-version: 1.19
 commands:
   jobs:
     description: "opens job menu"
+  /:
+    description: "out of character shit"
+  advert:
+    description: "Post an in-game advert"
+    aliases: [ad, adv]

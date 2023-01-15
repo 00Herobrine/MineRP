@@ -2,8 +2,6 @@ package x00Hero.MineRP.Items.MoneyPrinters;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 
@@ -17,6 +15,7 @@ public class MoneyPrinter {
     private Hologram hologram;
 
     public MoneyPrinter() {
+        name = "Money Printer";
         material = Material.SMOOTH_STONE_SLAB;
         enabled = false;
         generateMin = 15;
@@ -164,8 +163,9 @@ public class MoneyPrinter {
     }
 
     public void createHologram() {
-        Hologram nHologram = new Hologram(location, name);
-        nHologram.addLine("Battery: ");
+        Hologram hologram = new Hologram("cunt", location);
+        hologram.addLine("Battery: ");
+        this.hologram = hologram;
     }
 
     public void updatedDisplay() {

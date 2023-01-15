@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static x00Hero.MineRP.Main.getTags;
 import static x00Hero.MineRP.Main.plugin;
 
 public class DoorController implements Listener {
@@ -55,16 +54,13 @@ public class DoorController implements Listener {
     public void DoorInteract(DoorInteractEvent e) {
         RPlayer rPlayer = e.getRPlayer();
         Player player = rPlayer.getPlayer();
-        ItemStack heldItem = player.getInventory().getItemInMainHand();
         OwnableDoor door = e.getDoor();
         Location location = door.getLocation();
         World world = location.getWorld();
         boolean rightClick = e.isRightClick();
         boolean isSneaking = player.isSneaking();
-        boolean isKeys = false;
+        boolean isKeys = e.isKeys();
         boolean isOwner = door.isOwner(player.getUniqueId()); // checks if is an owner of the door
-        if(heldItem.getType() != null && heldItem.getType() != Material.AIR && heldItem.hasItemMeta())
-            if(getTags(heldItem).equalsIgnoreCase("keyset")) isKeys = true;
         if(door.getOwner() == null && isSneaking && isKeys && rightClick) {
             // buy door
             e.getInteractEvent().setCancelled(true);
@@ -76,9 +72,8 @@ public class DoorController implements Listener {
                 if(rightClick) {
                     e.getInteractEvent().setCancelled(true);
                     door.setLocked(true);
-                    rPlayer.sendAlert("Door &cLocked&r!", Sound.BLOCK_BAMBOO_SAPLING_BREAK, 1f, 0.7f);
+                    rPlayer.sendAlert("Door &cLocked&r!");
                     location.getWorld().playSound(location, door.getLockSound(), 1f, 1f);
-                    return;
                 } else {
                     door.setLocked(false);
                     if(isSneaking) {
@@ -87,12 +82,12 @@ public class DoorController implements Listener {
                     }
                     rPlayer.sendAlert("Door &aUnlocked&r!");
                     location.getWorld().playSound(location, door.getUnlockSound(), 1f, 1f);
-                    return;
                 }
+                return;
             }
         }
         if(door.isLocked()) {
-            world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.7f, 1f); // not an owner, player knocking sound
+            world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.7f, 1f); // play knocking sound
             TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 3);
             if(rightClick) rPlayer.addAlert(alert);
             e.getInteractEvent().setCancelled(true);

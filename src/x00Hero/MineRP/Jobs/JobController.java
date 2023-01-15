@@ -7,10 +7,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Events.Constructors.Player.PayCheckEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
+import x00Hero.MineRP.GUI.MenuController;
 import x00Hero.MineRP.Items.Generic.Lockpick;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
@@ -24,7 +26,8 @@ import static x00Hero.MineRP.Main.*;
 public class JobController implements Listener {
     private static HashMap<String, Job> jobs = new HashMap<>(); //jobID, Job
     private static File jobsFile = new File(plugin.getDataFolder(), "jobs.yml");
-    private static ArrayList<JobItem> defaultItems = new ArrayList<>();
+    private static HashMap<String, JobItem> defaultItems = new HashMap<>();
+    private static HashMap<String, JobItem> cachedJobItems = new HashMap<>(); //itemID, JobItem
 
     public static void cacheJobs() {
         if(!jobsFile.exists()) plugin.saveResource("jobs.yml", false);
@@ -43,8 +46,9 @@ public class JobController implements Listener {
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
         }
-        defaultItems.add(Lockpick.lockpick);
-        defaultItems.add(DoorController.keys);
+        defaultItems.put("lockpick", Lockpick.lockpick);
+        defaultItems.put("keyset", DoorController.keys);
+        defaultItems.put("menubook", MenuController.jobBook);
     }
 
     public static void paycheckLoop() {
@@ -68,7 +72,7 @@ public class JobController implements Listener {
         rPlayer.setPayCheckTime(time);
     }
 
-    public static ArrayList<JobItem> getDefaultItems() {
+    public static HashMap<String, JobItem> getDefaultItems() {
         return defaultItems;
     }
 
@@ -93,6 +97,16 @@ public class JobController implements Listener {
         }
         Menu jobMenu = new Menu(menuItems,"Available Jobs", true, true);
         jobMenu.openMenu(player);
+    }
+
+    public static boolean isJobItem(ItemStack item) {
+        String tag = getTags(item);
+        if(defaultItems.containsKey(tag)) return true;
+        return cachedJobItems.containsKey(tag);
+    }
+
+    public static JobItem getJobItem(String itemID) {
+        return cachedJobItems.get(itemID);
     }
 
     public static YamlConfiguration getJobsConfig() {

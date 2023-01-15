@@ -12,6 +12,7 @@ import x00Hero.MineRP.Jobs.JobItem;
 import x00Hero.MineRP.Chat.TimedAlert;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RPlayer {
 
@@ -96,7 +97,8 @@ public class RPlayer {
 
     public void addAlert(TimedAlert alert) {
         ArrayList<TimedAlert> alerts = getTimedAlerts();
-        if(alerts.size() == 0) {
+        if(alerts.size() == 0 && currentAlert == null) {
+//            currentAlert = alert;
             if(alert.getSound() != null) {
                 ChatController.sendAlert(player, alert.getMessage(), alert.getSound());
             } else {
@@ -151,8 +153,8 @@ public class RPlayer {
     }
 
     public void setDefaultItems() {
-        ArrayList<JobItem> defaults = JobController.getDefaultItems();
-        for(JobItem items : defaults) {
+        HashMap<String, JobItem> defaults = JobController.getDefaultItems();
+        for(JobItem items : defaults.values()) {
             int slot = items.getSlot();
             ItemStack itemStack = items.getItemStack();
             player.getInventory().setItem(slot, itemStack);

@@ -1,6 +1,5 @@
 package x00Hero.MineRP.GUI.Constructors;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -27,7 +26,6 @@ public class Menu {
     public void setSecureContainer(boolean secureContainer) {
         isSecureContainer = secureContainer;
     }
-
 
     public void setPage(int page, MenuPage menuPage) {
         menuPages.put(page, menuPage);

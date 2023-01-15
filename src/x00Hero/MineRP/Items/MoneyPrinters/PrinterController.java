@@ -30,6 +30,7 @@ public class PrinterController {
 //        if(!printers.contains("printers")) return;
         for(String printerID : printers.getConfigurationSection("printers").getKeys(false)) {
             ConfigurationSection printerConfig = printers.getConfigurationSection("printers." + printerID);
+            assert printerConfig != null;
             String name = printerConfig.getString("name");
             printer.setName(name);
             if(printerConfig.contains("lore")) printer.setLore(printerConfig.getString("lore"));
@@ -54,6 +55,10 @@ public class PrinterController {
         }, 20, 20);
     }
 
+    public static MoneyPrinter getPrinter(String printerID) {
+        return cachedPrinters.get(printerID);
+    }
+
     @EventHandler
     public void printerTick(PrinterTickEvent e) {
         MoneyPrinter printer = e.getPrinter();
@@ -74,7 +79,6 @@ public class PrinterController {
     public void printerCreate(PrinterCreateEvent e) {
         MoneyPrinter printer = e.getPrinter();
         printer.setLocation(e.getLocation());
-
     }
 
     public void displayCheck() {
