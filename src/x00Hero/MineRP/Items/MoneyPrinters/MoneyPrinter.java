@@ -12,7 +12,7 @@ public class MoneyPrinter {
     private String permission = null, name, lore;
     private ItemStack itemStack = null;
     private Location location;
-//    private Hologram hologram;
+    private Hologram hologram;
 
     public MoneyPrinter() {
         name = "Money Printer";
@@ -160,24 +160,39 @@ public class MoneyPrinter {
     }
 
     public Hologram getHologram() {
-        return HologramController.getHologram(location);
+        return hologram;
+//        return HologramController.getHologram(location);
     }
 
     public void createHologram() {
-        Hologram hologram = new Hologram("cunt", location);
+        Hologram hologram = new Hologram(location);
         hologram.addLine(name);
         hologram.addLine("Battery: " + battery);
         hologram.addLine("Cash: " + balance + "/" + maxCash);
         hologram.addLine("Status: " + ((enabled) ? "ENABLED" : "DISABLED"));
         if(alert) hologram.addLine("+ Alert Upgrade");
-        HologramController.addHologram(hologram.create());
-//        this.hologram = hologram;
+        hologram = hologram.create();
+        HologramController.addHologram(hologram);
+        this.hologram = hologram;
     }
 
     public void destroyHologram() {
         Hologram hologram = getHologram();
         hologram.remove();
         HologramController.removeHologram(hologram);
+    }
+
+    public void copyDefaults(MoneyPrinter defaults) {
+        name = defaults.getName();
+        material = defaults.getMaterial();
+        enabled = defaults.isEnabled();
+        alert = defaults.hasAlert();
+        generateMin = defaults.getGenerateMin();
+        generateMax = defaults.getGenerateMax();
+        battery = defaults.getBattery();
+        interval = defaults.getInterval();
+        maxCash = defaults.getMaxCash();
+        printTime = defaults.getInterval();
     }
 
     public boolean hasAlert() {

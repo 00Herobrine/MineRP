@@ -4,17 +4,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import static x00Hero.MineRP.Main.plugin;
 
 public class HologramController {
-    private static HashMap<Location, Hologram> holograms = new HashMap<>();
+    private static ArrayList<Hologram> hologramsList = new ArrayList<>();
+    private static long interval = 20;
+
+    public static void loadConfig() {
+        interval = plugin.getConfig().getLong("hologram-tick");
+    }
 
     public static void visibilityLoop() {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             for(Player player : Bukkit.getOnlinePlayers()) {
-                for(Hologram hologram : holograms.values()) {
+                for(Hologram hologram : hologramsList) {
                     Location playerLoc = player.getLocation();
                     Location holoLoc = hologram.getLocation();
                     double distance = playerLoc.distance(holoLoc);
@@ -22,19 +27,15 @@ public class HologramController {
                     else if(!hologram.isViewing(player)) hologram.show(player);
                 }
             }
-        }, 20, 20);
+        }, 0, interval);
     }
 
     public static void addHologram(Hologram hologram) {
-        holograms.put(hologram.getLocation(), hologram);
+        hologramsList.add(hologram);
     }
 
     public static void removeHologram(Hologram hologram) {
-        holograms.remove(hologram.getLocation());
-    }
-
-    public static Hologram getHologram(Location location) {
-        return holograms.get(location);
+        hologramsList.remove(hologram);
     }
 
 }

@@ -11,15 +11,13 @@ import java.util.ArrayList;
 
 public class Hologram {
 
-    private String name;
     private Location location;
     private ArrayList<ArmorStand> displays = new ArrayList<>();
     private ArrayList<String> lines =  new ArrayList<>();
     private ArrayList<Player> viewers = new ArrayList<>();
-    private int visibleRange = 3;
+    private int visibleRange = 5;
 
-    public Hologram(String name, Location location) {
-        this.name = name;
+    public Hologram(Location location) {
         this.location = location;
     }
 
@@ -51,12 +49,7 @@ public class Hologram {
             displays.add(entity);
             holoLoc.add(0.0D, 0.25D, 0.0D);
         }
-//        location = displays.get(0).getLocation();
         return this;
-    }
-
-    public void updateArmorStand() {
-
     }
 
     public Location getLocation() {

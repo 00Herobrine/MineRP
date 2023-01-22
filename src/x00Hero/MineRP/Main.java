@@ -41,6 +41,8 @@ public class Main extends JavaPlugin {
         cacheConfigs();
         registerLoops();
         registerCommands();
+        getConfig();
+        saveDefaultConfig();
         getLogger().info("Enabled " + getDescription().getFullName());
     }
 
@@ -49,6 +51,7 @@ public class Main extends JavaPlugin {
         PrinterController.cachePrinters();
         DoorController.cacheDoors();
         ChatController.cacheMessages();
+        HologramController.loadConfig();
         for(Player player : Bukkit.getOnlinePlayers()) {
             createRPlayer(player);
         }

@@ -17,8 +17,7 @@ import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Player.RPlayer;
 
-import static x00Hero.MineRP.Main.cacheConfigs;
-import static x00Hero.MineRP.Main.getRPlayer;
+import static x00Hero.MineRP.Main.*;
 
 public class CommandManager implements CommandExecutor, Listener {
 
@@ -30,8 +29,8 @@ public class CommandManager implements CommandExecutor, Listener {
         switch(label) {
             case "minerp":
                 if(args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                    rPlayer.sendMessage("Configs reloaded.");
                     cacheConfigs();
+                    rPlayer.sendMessage("Configs reloaded.");
                 }
                 break;
             case "jobs":
@@ -51,7 +50,7 @@ public class CommandManager implements CommandExecutor, Listener {
                     break;
                 }
                 Location location = player.getLocation();
-                Hologram hologram = new Hologram("command", location);
+                Hologram hologram = new Hologram(location);
                 for(String arg : args) {
                     hologram.addLine(arg);
                 }

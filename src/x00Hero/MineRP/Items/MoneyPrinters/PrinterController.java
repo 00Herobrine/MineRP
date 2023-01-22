@@ -85,7 +85,8 @@ public class PrinterController implements Listener {
 
     @EventHandler
     public void printerCreate(PrinterCreateEvent e) {
-        MoneyPrinter printer = e.getPrinter();
+        MoneyPrinter printer = new MoneyPrinter();
+        printer.copyDefaults(e.getPrinter());
         Location location = e.getLocation();
 //        Bukkit.broadcastMessage("printer location set to " + location);
         printer.setLocation(location);
