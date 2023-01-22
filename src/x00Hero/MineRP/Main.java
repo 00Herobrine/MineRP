@@ -1,7 +1,11 @@
 package x00Hero.MineRP;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,9 +16,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import x00Hero.MineRP.Chat.ChatController;
 import x00Hero.MineRP.Chat.CommandManager;
-import x00Hero.MineRP.Events.DefaultMC.InteractEvent;
+import x00Hero.MineRP.Events.DefaultMC.InteractHandler;
 import x00Hero.MineRP.Events.DefaultMC.PlayerJoin;
 import x00Hero.MineRP.Items.Generic.Lockpick;
+import x00Hero.MineRP.Items.MoneyPrinters.HologramController;
 import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Player.DoorController;
@@ -53,10 +58,11 @@ public class Main extends JavaPlugin {
         getCommand("/").setExecutor(new CommandManager());
         getCommand("advert").setExecutor(new CommandManager());
         getCommand("minerp").setExecutor(new CommandManager());
+        getCommand("printers").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
-        pm.registerEvents(new InteractEvent(), this);
+        pm.registerEvents(new InteractHandler(), this);
         pm.registerEvents(new PlayerJoin(), this);
         pm.registerEvents(new PayCheckController(), this);
         pm.registerEvents(new DoorController(), this);
@@ -64,6 +70,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new Lockpick(), this);
         pm.registerEvents(new ChatController(), this);
         pm.registerEvents(new CommandManager(), this);
+        pm.registerEvents(new PrinterController(), this);
     }
 
     public static void registerLoops() {
@@ -71,6 +78,7 @@ public class Main extends JavaPlugin {
         PrinterController.printerLoop();
         ChatController.alertLoop();
         Lockpick.lockPickLoop();
+        HologramController.visibilityLoop(); // Change to temporary display on whoever clicks it for printer stats
     }
 
     public static ArrayList<RPlayer> getRPlayers() {
@@ -110,5 +118,19 @@ public class Main extends JavaPlugin {
             return container.get(namespacedKey, PersistentDataType.STRING);
         }
         return null;
+    }
+
+    public ArrayList<Player> getPlayersInDistance(Location location, double distance) {
+        ArrayList<Player> inDistance = new ArrayList<>();
+        ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+        entity.setCustomName(" ");
+        entity.setCustomNameVisible(true);
+        entity.setVisible(false);
+        entity.setGravity(false);
+        entity.setBasePlate(false);
+        for(Entity entities : entity.getNearbyEntities(distance, distance, distance))
+            if(entities instanceof Player) inDistance.add((Player) entities);
+        entity.remove();
+        return inDistance;
     }
 }

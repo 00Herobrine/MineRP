@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList;
 import x00Hero.MineRP.Items.MoneyPrinters.MoneyPrinter;
 
 public class PrinterCreateEvent extends Event {
-    private final HandlerList handlerList = new HandlerList();
+    private final static HandlerList handlerList = new HandlerList();
     private final Player whoPlaced;
     private final MoneyPrinter printer;
     private final Location location;
@@ -35,7 +35,7 @@ public class PrinterCreateEvent extends Event {
         return handlerList;
     }
 
-    public HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return handlerList;
     }
 }

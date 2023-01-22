@@ -1,16 +1,20 @@
 package x00Hero.MineRP.Items.MoneyPrinters;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterCreateEvent;
+import x00Hero.MineRP.Events.Constructors.Printers.PrinterDestroyedEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterPrintEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterTickEvent;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
+import x00Hero.MineRP.Player.RPlayer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,10 +22,10 @@ import java.util.HashMap;
 
 import static x00Hero.MineRP.Main.plugin;
 
-public class PrinterController {
+public class PrinterController implements Listener {
     private static File printersFile = new File(plugin.getDataFolder(), "printers.yml");
     private static HashMap<String, MoneyPrinter> cachedPrinters = new HashMap<>(); // printerID, printer
-    private static ArrayList<MoneyPrinter> moneyPrinters = new ArrayList<>(); // player owned printers (might need a stored UUID for each printer)
+    private static HashMap<Location, MoneyPrinter> moneyPrinters = new HashMap<>(); // player owned printers (might need a stored UUID for each printer)
 
     public static void cachePrinters() {
         if(!printersFile.exists()) plugin.saveResource("printers.yml", false);
@@ -49,13 +53,17 @@ public class PrinterController {
 
     public static void printerLoop() {
         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            for(MoneyPrinter printer : moneyPrinters) {
+            for(MoneyPrinter printer : moneyPrinters.values()) {
                 Bukkit.getPluginManager().callEvent(new PrinterTickEvent(printer));
             }
         }, 20, 20);
     }
 
-    public static MoneyPrinter getPrinter(String printerID) {
+    public static MoneyPrinter getPrinter(Location location) {
+        return moneyPrinters.get(location);
+    }
+
+    public static MoneyPrinter getCachedPrinter(String printerID) {
         return cachedPrinters.get(printerID);
     }
 
@@ -78,14 +86,20 @@ public class PrinterController {
     @EventHandler
     public void printerCreate(PrinterCreateEvent e) {
         MoneyPrinter printer = e.getPrinter();
-        printer.setLocation(e.getLocation());
+        Location location = e.getLocation();
+//        Bukkit.broadcastMessage("printer location set to " + location);
+        printer.setLocation(location);
+        printer.createHologram();
+        addPrinter(printer);
     }
 
-    public void displayCheck() {
-        for(MoneyPrinter printer : moneyPrinters) {
-            Hologram hologram = printer.getHologram();
-//            printer.getLocation()
-        }
+    @EventHandler
+    public void printerDestroyed(PrinterDestroyedEvent e) {
+        MoneyPrinter printer = e.getPrinter();
+        RPlayer rPlayer = e.getDestroyer();
+        printer.destroyHologram();
+        if(printer.hasAlert()) rPlayer.sendMessage("Your printer has been " + e.getDestructionMethod());
+        removePrinter(printer);
     }
 
     public void printersMenu() {
@@ -98,7 +112,19 @@ public class PrinterController {
 //        Menu menu = new Menu("Printers");
     }
 
-    public void createDisplay(Player player, MoneyPrinter printer) {
+    public void addPrinter(MoneyPrinter printer) {
+        Location location = printer.getLocation();
+        moneyPrinters.put(location, printer);
+//        Bukkit.broadcastMessage("Created printer at " + location);
+    }
 
+    public void removePrinter(MoneyPrinter printer) {
+        Location location = printer.getLocation();
+        moneyPrinters.remove(location);
+//        Bukkit.broadcastMessage("Removed printer at " + location);
+    }
+
+    public static boolean contains(Location location) {
+        return moneyPrinters.containsKey(location);
     }
 }

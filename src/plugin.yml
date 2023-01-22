@@ -4,6 +4,8 @@ version: 0.1
 prefix: MineRP
 api-version: 1.19
 commands:
+  printers:
+    description: "opens the available printers to purchase"
   jobs:
     description: "opens job menu"
   /:

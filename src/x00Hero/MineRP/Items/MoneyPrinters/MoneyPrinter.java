@@ -6,18 +6,19 @@ import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 
 public class MoneyPrinter {
-    private boolean enabled;
+    private boolean enabled, alert;
     private Material material;
-    private int generateMin, generateMax, battery, maxBattery, interval, cashHolder, maxCash, printTime, price, ownLimit;
+    private int generateMin, generateMax, battery, maxBattery, interval, balance, maxCash, printTime, price, ownLimit;
     private String permission = null, name, lore;
     private ItemStack itemStack = null;
     private Location location;
-    private Hologram hologram;
+//    private Hologram hologram;
 
     public MoneyPrinter() {
         name = "Money Printer";
         material = Material.SMOOTH_STONE_SLAB;
         enabled = false;
+        alert = true;
         generateMin = 15;
         generateMax = 20;
         battery = 100;
@@ -70,11 +71,11 @@ public class MoneyPrinter {
         this.interval = interval;
     }
 
-    public int getCashHolder() {
-        return cashHolder;
+    public int getBalance() {
+        return balance;
     }
-    public void setCashHolder(int cashHolder) {
-        this.cashHolder = cashHolder;
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 
     public int getMaxCash() {
@@ -152,23 +153,38 @@ public class MoneyPrinter {
 
     public ItemStack getItemStack() {
         if(itemStack == null) {
-            ItemBuilder itemBuilder = new ItemBuilder(material, name, lore);
+            ItemBuilder itemBuilder = new ItemBuilder(material, name, lore, "moneyprinter");
             itemStack = itemBuilder.getItemStack();
         }
         return itemStack;
     }
 
     public Hologram getHologram() {
-        return hologram;
+        return HologramController.getHologram(location);
     }
 
     public void createHologram() {
         Hologram hologram = new Hologram("cunt", location);
-        hologram.addLine("Battery: ");
-        this.hologram = hologram;
+        hologram.addLine(name);
+        hologram.addLine("Battery: " + battery);
+        hologram.addLine("Cash: " + balance + "/" + maxCash);
+        hologram.addLine("Status: " + ((enabled) ? "ENABLED" : "DISABLED"));
+        if(alert) hologram.addLine("+ Alert Upgrade");
+        HologramController.addHologram(hologram.create());
+//        this.hologram = hologram;
     }
 
-    public void updatedDisplay() {
-        
+    public void destroyHologram() {
+        Hologram hologram = getHologram();
+        hologram.remove();
+        HologramController.removeHologram(hologram);
     }
+
+    public boolean hasAlert() {
+        return alert;
+    }
+    public void setAlert(boolean alert) {
+        this.alert = alert;
+    }
+
 }
