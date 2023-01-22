@@ -52,6 +52,7 @@ public class Main extends JavaPlugin {
         DoorController.cacheDoors();
         ChatController.cacheMessages();
         HologramController.loadConfig();
+        Lockpick.loadConfig();
         for(Player player : Bukkit.getOnlinePlayers()) {
             createRPlayer(player);
         }

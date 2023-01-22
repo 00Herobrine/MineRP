@@ -28,7 +28,12 @@ public class Lockpick implements Listener {
     public static JobItem lockpick = new JobItem(lockpickItem, 6);
     private static final ArrayList<Location> lockpicking = new ArrayList<>(); // doors being lockpicked
     private static final HashMap<UUID, Long> cooldowns = new HashMap<>();
-    private static final int timeout = 250;
+    private static int timeout = 250, cooldown = 3;
+
+    public static void loadConfig() {
+        timeout = plugin.getConfig().getInt("lockpick-timeout");
+        cooldown = plugin.getConfig().getInt("lockpick-cooldown");
+    }
 
     public String getProgressBar(int current, int max, int totalBars, String symbol, String completedColor, String notCompletedColor) {
         float percent = (float) current / max;
@@ -42,8 +47,7 @@ public class Lockpick implements Listener {
     }
 
     public static void addCooldown(UUID uuid) {
-        int duration = 2;
-        long futureTime = System.currentTimeMillis() + (duration * 1000L);
+        long futureTime = System.currentTimeMillis() + (cooldown * 1000L);
         cooldowns.put(uuid, futureTime);
     }
 
@@ -72,9 +76,9 @@ public class Lockpick implements Listener {
                 }
             }
             for(UUID uuid : cooldowns.keySet()) {
-                if(cooldowns.get(uuid) > curTime) removeCooldown(uuid);
+                if(cooldowns.get(uuid) < curTime) removeCooldown(uuid);
             }
-        }, 20, 20);
+        }, 0, 20);
     }
 
     public void startLockPicking(OwnableDoor door, UUID playerID) {
