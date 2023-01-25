@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
+import x00Hero.MineRP.GUI.Constructors.Menu;
 
 public class MoneyPrinter {
     private boolean enabled, alert;
@@ -13,6 +14,7 @@ public class MoneyPrinter {
     private ItemStack itemStack = null;
     private Location location;
     private Hologram hologram;
+//    private Menu printerMenu = new Menu("Printer", "Printer", false, true);
 
     public MoneyPrinter() {
         name = "Money Printer";
@@ -161,7 +163,6 @@ public class MoneyPrinter {
 
     public Hologram getHologram() {
         return hologram;
-//        return HologramController.getHologram(location);
     }
 
     public void createHologram() {

@@ -256,7 +256,7 @@ public class Menu {
         }
     }*/
 
-    public void openMenu(Player player) {
+    public void openMenu(Player player) { // maybe generate and store the menu on open, if cache == null cache the display on the menu itself
         openMenu(player, 1);
     }
 

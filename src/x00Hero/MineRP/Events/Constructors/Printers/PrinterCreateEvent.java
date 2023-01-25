@@ -1,18 +1,18 @@
 package x00Hero.MineRP.Events.Constructors.Printers;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import x00Hero.MineRP.Items.MoneyPrinters.MoneyPrinter;
+import x00Hero.MineRP.Player.RPlayer;
 
 public class PrinterCreateEvent extends Event {
     private final static HandlerList handlerList = new HandlerList();
-    private final Player whoPlaced;
+    private final RPlayer whoPlaced;
     private final MoneyPrinter printer;
     private final Location location;
 
-    public PrinterCreateEvent(MoneyPrinter printer, Player whoPlaced, Location location) {
+    public PrinterCreateEvent(MoneyPrinter printer, RPlayer whoPlaced, Location location) {
         this.printer = printer;
         this.whoPlaced = whoPlaced;
         this.location = location;
@@ -22,7 +22,7 @@ public class PrinterCreateEvent extends Event {
         return printer;
     }
 
-    public Player getWhoPlaced() {
+    public RPlayer getWhoPlaced() {
         return whoPlaced;
     }
 

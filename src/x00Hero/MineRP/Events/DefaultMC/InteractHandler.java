@@ -13,18 +13,20 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import x00Hero.MineRP.Events.Constructors.Crate.WeaponCratePlaceEvent;
 import x00Hero.MineRP.Events.Constructors.JobItemInteractEvent;
 import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
 import x00Hero.MineRP.Events.Constructors.Player.LockPickDoorEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterCreateEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterDestroyedEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterInteractEvent;
+import x00Hero.MineRP.Items.CrateController;
 import x00Hero.MineRP.Items.Generic.OwnableDoor;
 import x00Hero.MineRP.Items.MoneyPrinters.MoneyPrinter;
 import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
+import x00Hero.MineRP.Items.WeaponCrate;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Jobs.JobItem;
-import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -79,13 +81,22 @@ public class InteractHandler implements Listener {
     @EventHandler
     public void BlockPlaceEvent(BlockPlaceEvent e) {
         Player player = e.getPlayer();
+        RPlayer rPlayer = getRPlayer(player);
         ItemStack item = e.getItemInHand();
         Location location = e.getBlock().getLocation();
-        if(Main.hasTags(item, "moneyprinter")) {
-            String printerID = "shit";
-            MoneyPrinter printer = PrinterController.getCachedPrinter(printerID);
+        switch(getTags(item)) {
+            case "moneyprinter":
+                String printerID = "shit";
+                MoneyPrinter printer = PrinterController.getCachedPrinter(printerID);
 //            Bukkit.broadcastMessage("placed block at " + location);
-            Bukkit.getPluginManager().callEvent(new PrinterCreateEvent(printer, player, location));
+                Bukkit.getPluginManager().callEvent(new PrinterCreateEvent(printer, rPlayer, location));
+                break;
+            case "weaponcrate":
+                WeaponCrate weaponCrate = CrateController.getCrate(location);
+                Bukkit.getPluginManager().callEvent(new WeaponCratePlaceEvent(weaponCrate, rPlayer, location));
+                break;
+            default:
+                break;
         }
     }
 

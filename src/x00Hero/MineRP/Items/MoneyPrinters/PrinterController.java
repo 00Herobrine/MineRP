@@ -99,17 +99,19 @@ public class PrinterController implements Listener {
         MoneyPrinter printer = e.getPrinter();
         RPlayer rPlayer = e.getDestroyer();
         printer.destroyHologram();
-        if(printer.hasAlert()) rPlayer.sendMessage("Your printer has been " + e.getDestructionMethod());
+        if(printer.hasAlert()) rPlayer.sendMessage("Your printer has been " + e.getDestructionMethod() + ".");
         removePrinter(printer);
     }
 
-    public void printersMenu() {
+    public void printersMenu(Player player) {
         ArrayList<MenuItem> menuItems = new ArrayList<>();
         for(String printerID : cachedPrinters.keySet()) {
             MoneyPrinter printer = cachedPrinters.get(printerID);
             MenuItem menuItem = new MenuItem(printer.getItemStack(), printerID);
+            menuItems.add(menuItem);
         }
         Menu menu = new Menu(menuItems, "Money Printers", true, true);
+        menu.openMenu(player);
 //        Menu menu = new Menu("Printers");
     }
 
