@@ -105,10 +105,8 @@ public class DoorController implements Listener {
     }
 
     public void buyDoor(RPlayer rPlayer, OwnableDoor door) {
-        int price = door.getPrice();
-        door.setOwner(rPlayer.getPlayer().getUniqueId());
-        rPlayer.removeCash(price);
-        rPlayer.sendAlert("Purchased door for " + price);
+        if(rPlayer.attemptPurchase(door.getPrice(), "door", true))
+            door.setOwner(rPlayer.getPlayer().getUniqueId());
     }
 
     public static HashMap<Location, OwnableDoor> getCachedDoors() {
