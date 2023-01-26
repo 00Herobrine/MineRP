@@ -1,5 +1,6 @@
 package x00Hero.MineRP.Chat;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
 public class TimedAlert {
@@ -15,7 +16,7 @@ public class TimedAlert {
     }
 
     public TimedAlert(String message, Integer length) {
-        this.message = message;
+        this.message = ChatColor.translateAlternateColorCodes('&', message);
         this.length = length;
     }
 

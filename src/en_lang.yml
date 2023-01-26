@@ -1,0 +1,7 @@
+prefix: "[MineRP]"
+prefix-ooc: "&7[&rOOC&7]&r"
+prefix-ad: "&7[&6AD&7]&r"
+format: "$prefix $msg"
+invalid-args: "Invalid arguments."
+invalid-permission: "You do not have permission for this command."
+config-reload: "Configs reloaded"

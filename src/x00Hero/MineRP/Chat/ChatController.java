@@ -69,6 +69,10 @@ public class ChatController implements Listener {
         }
     }
 
+    public String getMessage(String ID) {
+        return null;
+    }
+
     public static TextComponent getComponent(String message) {
         return new TextComponent(ChatColor.translateAlternateColorCodes('&', message));
     }

@@ -57,14 +57,14 @@ public class CommandManager implements CommandExecutor, Listener {
                 HologramController.addHologram(hologram.create());
                 break;
             case "balance":
-                rPlayer.sendMessage("Your current balance is " + rPlayer.getCash() + ".");
+                balance(rPlayer, args);
                 break;
             case "advert":
             case "/":
                 StringBuilder sb = new StringBuilder();
                 String color = "&r";
                 for(String arg : args) {
-                    sb.append(arg + " ");
+                    sb.append(arg).append(" ");
                 }
                 String prefix = "&7[&rOOC&7]&r ";
                 if(label.equalsIgnoreCase("advert")) {
@@ -87,6 +87,44 @@ public class CommandManager implements CommandExecutor, Listener {
         if(!p.hasPermission("efm.admin")) {
             if(cmd.equalsIgnoreCase("/pl") || cmd.startsWith("/plugin")) { // remove from tab list as well
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    public void balance(RPlayer rPlayer, String[] args) {
+        if(args.length == 0) rPlayer.sendMessage("Your current balance is $" + rPlayer.getCash() + ".");
+        else {
+            if(args[0].equalsIgnoreCase("add")) {
+                if(args.length < 2) {
+                    rPlayer.sendMessage("Invalid arguments.");
+                    return;
+                }
+                if(args[1].matches("[0-9]+")) {
+                    int amount = Integer.parseInt(args[1]);
+                    rPlayer.addCash(amount, "Added $" + amount + " to your balance.");
+                } else {
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if(target == null) {
+                        rPlayer.sendMessage("Invalid player.");
+                        return;
+                    }
+                    RPlayer tar = getRPlayer(target);
+                    if(args[2].matches("[0-9]+")) {
+                        int amount = Integer.parseInt(args[2]);
+                        tar.addCash(amount, "");
+                        rPlayer.sendMessage("Added $" + amount + " to " + target.getName() + ".");
+                    } else {
+                        rPlayer.sendMessage("Invalid amount.");
+                    }
+                }
+            } else {
+                Player target = Bukkit.getPlayer(args[0]);
+                if(target != null) {
+                    RPlayer tar = getRPlayer(target);
+                    rPlayer.sendMessage(target.getName() + "'s current balance is $" + tar.getCash() + ".");
+                } else {
+                    rPlayer.sendMessage("Invalid arguments.");
+                }
             }
         }
     }

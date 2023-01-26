@@ -53,23 +53,48 @@ public class RPlayer {
         ChatController.sendMessage(player, message, sound);
     }
 
+    public File getPlayerFile() {
+        return playerFile;
+    }
+    public void playerFileCheck() {
+        try {
+            if(!playersFolder.exists()) playersFolder.mkdir();
+            if(!playerFile.exists()) playerFile.createNewFile();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void loadPlayerFile() {
+        playerFileCheck();
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
+        cash = config.getLong("cash");
+        bank = config.getLong("bank");
+    }
+    public void savePlayerFile() {
+        playerFileCheck();
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
+        config.set("cash", cash);
+        config.set("bank", bank);
+        try {
+            config.save(playerFile);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //region Jail Stuff
     private boolean inJail = false;
-
     private long releaseTime;
 
     public boolean isInJail() {
         return inJail;
     }
-
     public void setInJail(boolean inJail) {
         this.inJail = inJail;
     }
-
     public long getReleaseTime() {
         return releaseTime;
     }
-
     public void setReleaseTime(long releaseTime) {
         this.releaseTime = releaseTime;
     }
@@ -77,7 +102,6 @@ public class RPlayer {
     public boolean isWanted() {
         return wanted;
     }
-
     public void setWanted(boolean wanted) {
         this.wanted = wanted;
     }
@@ -103,31 +127,25 @@ public class RPlayer {
         }
         alerts.add(alert);
     }
-
     public TimedAlert getCurrentAlert() {
         return currentAlert;
     }
-
     public void setCurrentAlert(TimedAlert currentAlert) {
         this.currentAlert = currentAlert;
     }
-
     public ArrayList<TimedAlert> getTimedAlerts() {
         return timedAlerts;
     }
-
     public void sendAlert(String message) {
         TimedAlert timedAlert = new TimedAlert(message, 3);
         addAlert(timedAlert);
 //        ChatController.sendAlert(player, message);
     }
-
     public void sendAlert(String message, Sound sound) {
         TimedAlert alert = new TimedAlert(message, 3);
         alert.setSound(sound);
         addAlert(alert);
     }
-
     public void sendAlert(String message, Sound sound, float loudness, float speed) {
         TimedAlert alert = new TimedAlert(message, 3);
         alert.setSound(sound);
@@ -141,16 +159,22 @@ public class RPlayer {
     //region Cash Stuff
     public void setCash(long cash) {
         this.cash = cash;
+        savePlayerFile();
     }
-
     public void addCash(long amount) {
-        cash += amount;
+        addCash(amount, null);
     }
-
+    public void addCash(long amount, String message) {
+        cash += amount;
+        if(message != null) {
+            if(message.equalsIgnoreCase("")) message = "Received an influx of $" + amount + ".";
+            sendMessage(message);
+        }
+        savePlayerFile();
+    }
     public void removeCash(long amount) {
         cash -= amount;
     }
-
     public long getCash() {
         return cash;
     }
@@ -158,16 +182,14 @@ public class RPlayer {
     public boolean attemptPurchase(long price) {
         return attemptPurchase(price, null, false);
     }
-
     public boolean attemptPurchase(long price, boolean alert) {
         return attemptPurchase(price, null, alert);
     }
-
     public boolean attemptPurchase(long price, String item, boolean alert) {
         long newCash = cash - price;
-        boolean status = !(newCash <= 0);
-        String msg = "Purchased " + item + " for $" + price + ".";
-        if(!status) msg = "Lacking $" + Math.abs(newCash) + ".";
+        boolean status = !(newCash < 0);
+        String msg = "&aPurchased &r" + item + "&a for &r$" + price;
+        if(!status) msg = "&cLacking &r$" + Math.abs(newCash);
         else setCash(newCash);
         if(item != null)
             if(!alert) sendMessage(msg);
@@ -189,11 +211,9 @@ public class RPlayer {
     public long getPayCheckTime() {
         return PayCheckTime;
     }
-
     public void setPayCheckTime(long payCheckTime) {
         PayCheckTime = payCheckTime;
     }
-
     public void updatePayCheckTime() {
         setPayCheckTime(System.currentTimeMillis() + (job.getInterval() * 1000L));
     }
@@ -201,7 +221,6 @@ public class RPlayer {
     public Job getJob() {
         return job;
     }
-
     public void setJob(String jobName) {
         Job oldJob = getJob();
         Job job = JobController.getJob(jobName);
@@ -214,39 +233,6 @@ public class RPlayer {
             sendMessage("Cannot set job to " + jobName);
         }
     }
-
-    public File getPlayerFile() {
-        return playerFile;
-    }
-
-    public void playerFileCheck() {
-        try {
-            if(!playersFolder.exists()) playersFolder.mkdir();
-            if(!playerFile.exists()) playerFile.createNewFile();
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void loadPlayerFile() {
-        playerFileCheck();
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
-        cash = config.getLong("cash");
-        bank = config.getLong("bank");
-    }
-
-    public void savePlayerFile() {
-        playerFileCheck();
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
-        config.set("cash", cash);
-        config.set("bank", bank);
-        try {
-            config.save(playerFile);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void openJobsMenu() {
         JobController.JobMenu(player);
     }

@@ -25,5 +25,6 @@ jobs:
     material: RED_CONCRETE
     wage: 100
     interval: 600
+    check-msg: "Crime doesn't pay"
 default:
   keys: 8
