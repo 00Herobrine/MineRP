@@ -67,6 +67,7 @@ public class Main extends JavaPlugin {
         getCommand("minerp").setExecutor(new CommandManager());
         getCommand("printers").setExecutor(new CommandManager());
         getCommand("balance").setExecutor(new CommandManager());
+        getCommand("door").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
@@ -121,12 +122,18 @@ public class Main extends JavaPlugin {
     public static String getStoredString(ItemStack item, String key) {
         NamespacedKey namespacedKey = new NamespacedKey(plugin, key);
         ItemMeta itemMeta = item.getItemMeta();
-        assert itemMeta != null;
-        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-        if(container.has(namespacedKey, PersistentDataType.STRING)) {
-            return container.get(namespacedKey, PersistentDataType.STRING);
+        if(item.hasItemMeta()) {
+            assert itemMeta != null;
+            PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+            if(container.has(namespacedKey, PersistentDataType.STRING)) {
+                return container.get(namespacedKey, PersistentDataType.STRING);
+            }
         }
         return null;
+    }
+
+    public boolean hasStoredString() {
+        return false;
     }
 
     public ArrayList<Player> getPlayersInDistance(Location location, double distance) {

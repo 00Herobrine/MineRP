@@ -1,6 +1,7 @@
 package x00Hero.MineRP.Items.Generic;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.RPlayer;
@@ -11,7 +12,9 @@ import java.util.UUID;
 
 public class OwnableDoor {
     //region variables
+    private final String ID;
     private Location location;
+    private Material material;
     private UUID owner;
     private ArrayList<UUID> owners = new ArrayList<>();
     private int defaultLockPickTime, price, sellFee;
@@ -21,9 +24,12 @@ public class OwnableDoor {
     private HashMap<UUID, LockPickStat> lockpickers = new HashMap<>();
     //endregion
 
-    public OwnableDoor(Location location) {
+    public OwnableDoor(String ID, Location location) {
+        this.ID = ID;
         this.location = location;
+        this.material = Material.OAK_DOOR;
         this.locked = false;
+        this.price = 50;
         this.volume = 0.7f;
         this.lockPickVolume = 1f;
         this.defaultLockPickTime = 5;
@@ -33,11 +39,20 @@ public class OwnableDoor {
     }
 
     //region General
+    public String getID() {
+        return ID;
+    }
     public Location getLocation() {
         return location;
     }
     public void setLocation(Location location) {
         this.location = location;
+    }
+    public Material getMaterial() {
+        return material;
+    }
+    public void setMaterial(Material material) {
+        this.material = material;
     }
     public float getVolume() {
         return volume;

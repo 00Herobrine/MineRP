@@ -14,6 +14,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Events.Constructors.Crate.WeaponCratePlaceEvent;
+import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorDestroyedEvent;
+import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorPlacedEvent;
 import x00Hero.MineRP.Events.Constructors.JobItemInteractEvent;
 import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
 import x00Hero.MineRP.Events.Constructors.Player.LockPickDoorEvent;
@@ -84,19 +86,24 @@ public class InteractHandler implements Listener {
         RPlayer rPlayer = getRPlayer(player);
         ItemStack item = e.getItemInHand();
         Location location = e.getBlock().getLocation();
-        switch(getTags(item)) {
-            case "moneyprinter":
+        String tag = getTags(item);
+        if(tag == null) return;
+        switch(tag) {
+            case "moneyprinter" -> {
                 String printerID = "shit";
                 MoneyPrinter printer = PrinterController.getCachedPrinter(printerID);
 //            Bukkit.broadcastMessage("placed block at " + location);
                 Bukkit.getPluginManager().callEvent(new PrinterCreateEvent(printer, rPlayer, location));
-                break;
-            case "weaponcrate":
+            }
+            case "weaponcrate" -> {
                 WeaponCrate weaponCrate = CrateController.getCrate(location);
                 Bukkit.getPluginManager().callEvent(new WeaponCratePlaceEvent(weaponCrate, rPlayer, location));
-                break;
-            default:
-                break;
+            }
+            case "ownabledoor" -> {
+                OwnableDoor door = new OwnableDoor(item.getItemMeta().getDisplayName(), location);
+                door.setMaterial(item.getType());
+                Bukkit.getPluginManager().callEvent(new OwnableDoorPlacedEvent(door, rPlayer));
+            }
         }
     }
 
@@ -105,10 +112,12 @@ public class InteractHandler implements Listener {
         Player player = e.getPlayer();
         Block block = e.getBlock();
         Location location = block.getLocation();
-//        Bukkit.broadcastMessage("is mining a block at " + location);
         MoneyPrinter printer = PrinterController.getPrinter(location);
-//        Bukkit.broadcastMessage("printer? " + (PrinterController.contains(location)));
         if(printer != null) Bukkit.getPluginManager().callEvent(new PrinterDestroyedEvent(printer, player, "mined"));
+        else {
+            OwnableDoor door = DoorController.getDoor(location);
+            if(door != null) Bukkit.getPluginManager().callEvent(new OwnableDoorDestroyedEvent(door, player));
+        }
     }
 
 }

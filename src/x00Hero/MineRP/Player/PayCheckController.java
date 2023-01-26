@@ -12,7 +12,7 @@ public class PayCheckController implements Listener {
         RPlayer rPlayer = e.getRPlayer();
         if(!rPlayer.isInJail()) {
             long amount = e.getAmount();
-            rPlayer.sendMessage("Paycheck of $" + amount + " added to your balance.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+            rPlayer.sendMessage("Paycheck of $" + amount + " added to your balance.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7f, 1f);
             rPlayer.addCash(amount);
         } else {
             // in jail

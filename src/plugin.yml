@@ -18,3 +18,5 @@ commands:
   balance:
     description: "Shows your current balance"
     aliases: [bal]
+  door:
+    description: "Adds custom door item"

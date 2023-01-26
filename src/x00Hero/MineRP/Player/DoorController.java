@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorDestroyedEvent;
+import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorPlacedEvent;
 import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.Items.Generic.OwnableDoor;
@@ -14,6 +16,7 @@ import x00Hero.MineRP.Jobs.JobItem;
 import x00Hero.MineRP.Chat.TimedAlert;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -25,6 +28,7 @@ public class DoorController implements Listener {
     private static ItemStack keyRing = keyRingBuilder.getItemStack();
     public static JobItem keys = new JobItem(keyRing, 7);
     private static File doorsFile = new File(plugin.getDataFolder(), "doors.yml");
+    private YamlConfiguration config = YamlConfiguration.loadConfiguration(doorsFile);
     private static HashMap<Location, OwnableDoor> cachedDoors = new HashMap<>();
 
     public static void cacheDoors() {
@@ -39,9 +43,10 @@ public class DoorController implements Listener {
             int z = Integer.parseInt(locString[2]);
             World world = Bukkit.getWorld("world");
             Location location = new Location(world, x, y, z);
-            OwnableDoor ownableDoor = new OwnableDoor(location);
+            OwnableDoor ownableDoor = new OwnableDoor(doorID, location);
             if(door.contains("price")) ownableDoor.setPrice(door.getInt("price"));
             if(door.contains("locked")) ownableDoor.setLocked(door.getBoolean("locked"));
+            if(door.contains("material")) ownableDoor.setMaterial(Material.valueOf(door.getString("material")));
             if(door.contains("sound-lock")) ownableDoor.setLockSound(Sound.valueOf(door.getString("sound-lock")));
             if(door.contains("sound-unlock")) ownableDoor.setUnlockSound(Sound.valueOf(door.getString("sound-unlock")));
             if(door.contains("lockpick-time")) ownableDoor.setDefaultLockPickTime(door.getInt("lockpick-time"));
@@ -92,6 +97,46 @@ public class DoorController implements Listener {
             if(rightClick) rPlayer.addAlert(alert);
             e.getInteractEvent().setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void doorPlaced(OwnableDoorPlacedEvent e) {
+        addDoor(e.getDoor());
+    }
+
+    @EventHandler
+    public void doorDestroyed(OwnableDoorDestroyedEvent e) {
+        removeDoor(e.getDoor().getLocation());
+    }
+
+    public void addDoor(OwnableDoor door) {
+        Location location = door.getLocation();
+        cachedDoors.put(location, door);
+        ConfigurationSection conf = getConfig().createSection("doors." + door.getID());
+        conf.set("material", door.getMaterial().name());
+        String locString = (int) location.getX() + ", " + (int) location.getY() + ", " + (int) location.getZ();
+        conf.set("location", locString);
+        try {
+            getConfig().save(doorsFile);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeDoor(Location location) {
+        OwnableDoor door = cachedDoors.get(location);
+        cachedDoors.remove(location);
+        getConfig().set("doors." + door.getID(), null);
+        try {
+            getConfig().save(doorsFile);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        // remove from config
+    }
+
+    public YamlConfiguration getConfig() {
+        return config;
     }
 
     public void sellDoor(OwnableDoor door) {

@@ -3,6 +3,7 @@ package x00Hero.MineRP.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.Items.MoneyPrinters.Hologram;
 import x00Hero.MineRP.Items.MoneyPrinters.HologramController;
 import x00Hero.MineRP.Items.MoneyPrinters.MoneyPrinter;
@@ -73,6 +75,24 @@ public class CommandManager implements CommandExecutor, Listener {
                 }
                 String msg = prefix + player.getName() + ": " + color + sb;
                 Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', msg));
+                break;
+            case "door":
+                if(args.length < 2) {
+                    rPlayer.sendMessage("Invalid arguments.");
+                    break;
+                }
+                if(args[0].equalsIgnoreCase("create")) {
+                    Material material = Material.OAK_DOOR;
+                    if(args.length == 3) material = Material.getMaterial(args[2]);
+                    if(material != null) {
+                        ItemBuilder itemBuilder = new ItemBuilder(material, args[1], "Custom Door", "ownabledoor");
+                        player.getInventory().addItem(itemBuilder.getItemStack());
+                    } else {
+                        rPlayer.sendMessage("Invalid material.");
+                    }
+                } else {
+                    rPlayer.sendMessage("Invalid arguments");
+                }
                 break;
         }
         return false;
