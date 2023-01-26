@@ -7,7 +7,7 @@ public class MenuItem {
     private String announce;
     private int slot = -1;
     private boolean enabled = true;
-    private boolean cancelClick = true;
+    private boolean cancelClick = true, droppable = false;
     private MenuPage menuPage;
 
     public MenuItem(ItemStack itemStack, String ID) {
@@ -19,10 +19,6 @@ public class MenuItem {
         this.itemStack = itemStack;
         this.slot = slot;
         announce = ID;
-    }
-
-    public void setCancelClick(boolean cancelClick) {
-        this.cancelClick = cancelClick;
     }
 
     public MenuItem(ItemStack itemStack, int slot) {
@@ -58,9 +54,19 @@ public class MenuItem {
     public boolean isCancelClick() {
         return cancelClick;
     }
+    public void setCancelClick(boolean cancelClick) {
+        this.cancelClick = cancelClick;
+    }
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isDroppable() {
+        return droppable;
+    }
+    public void setDroppable(boolean droppable) {
+        this.droppable = droppable;
     }
 
     public int getSlot() {

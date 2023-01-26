@@ -70,8 +70,7 @@ public class ChatController implements Listener {
     }
 
     public static TextComponent getComponent(String message) {
-        TextComponent msg = new TextComponent(ChatColor.translateAlternateColorCodes('&', message));
-        return msg;
+        return new TextComponent(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     public static void sendAlert(Player player, String message) {
@@ -88,7 +87,16 @@ public class ChatController implements Listener {
     }
 
     public static void sendMessage(Player player, String message) {
+        sendMessage(player, message, null, 1f, 1f);
+    }
+
+    public static void sendMessage(Player player, String message, Sound sound) {
+        sendMessage(player, message, sound, 1f, 1f);
+    }
+
+    public static void sendMessage(Player player, String message, Sound sound, float volume, float speed) {
         String msg = prefix + message;
+        if(sound != null) player.playSound(player.getLocation(), sound, volume, speed);
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
     }
 

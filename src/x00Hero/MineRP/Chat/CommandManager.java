@@ -45,7 +45,7 @@ public class CommandManager implements CommandExecutor, Listener {
                         if(printer != null) player.getInventory().addItem(printer.getItemStack());
                         else rPlayer.sendMessage("Cannot find printer " + args[1]);
                     } else {
-                        rPlayer.sendMessage("Invalid arguments");
+                        rPlayer.sendMessage("Invalid arguments.");
                     }
                     break;
                 }
@@ -55,6 +55,9 @@ public class CommandManager implements CommandExecutor, Listener {
                     hologram.addLine(arg);
                 }
                 HologramController.addHologram(hologram.create());
+                break;
+            case "balance":
+                rPlayer.sendMessage("Your current balance is " + rPlayer.getCash() + ".");
                 break;
             case "advert":
             case "/":

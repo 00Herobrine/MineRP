@@ -2,6 +2,7 @@ package x00Hero.MineRP.Player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Chat.ChatController;
@@ -11,22 +12,29 @@ import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Jobs.JobItem;
 import x00Hero.MineRP.Chat.TimedAlert;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static x00Hero.MineRP.Main.playersFolder;
+import static x00Hero.MineRP.Main.plugin;
+
 public class RPlayer {
-
-    public RPlayer(Player player) {
-        this.player = player;
-    }
-
     private final Player player;
     private long cash = 0;
+    private long bank = 0;
     private boolean wanted = false;
     private Job job;
     private long PayCheckTime;
     private TimedAlert currentAlert;
     private ArrayList<TimedAlert> timedAlerts = new ArrayList<>();
+    private File playerFile;
+
+    public RPlayer(Player player) {
+        this.player = player;
+        playerFile = new File(plugin.getDataFolder() + "/players/" + player.getUniqueId() + ".yml");
+    }
 
     public Player getPlayer() {
         return player;
@@ -37,6 +45,14 @@ public class RPlayer {
         ChatController.sendMessage(player, message);
     }
 
+    public void sendMessage(String message, Sound sound, float volume, float speed) {
+        ChatController.sendMessage(player, message, sound, volume, speed);
+    }
+
+    public void sendMessage(String message, Sound sound) {
+        ChatController.sendMessage(player, message, sound);
+    }
+
     //region Jail Stuff
     private boolean inJail = false;
 
@@ -45,6 +61,7 @@ public class RPlayer {
     public boolean isInJail() {
         return inJail;
     }
+
     public void setInJail(boolean inJail) {
         this.inJail = inJail;
     }
@@ -52,6 +69,7 @@ public class RPlayer {
     public long getReleaseTime() {
         return releaseTime;
     }
+
     public void setReleaseTime(long releaseTime) {
         this.releaseTime = releaseTime;
     }
@@ -59,6 +77,7 @@ public class RPlayer {
     public boolean isWanted() {
         return wanted;
     }
+
     public void setWanted(boolean wanted) {
         this.wanted = wanted;
     }
@@ -84,25 +103,31 @@ public class RPlayer {
         }
         alerts.add(alert);
     }
+
     public TimedAlert getCurrentAlert() {
         return currentAlert;
     }
+
     public void setCurrentAlert(TimedAlert currentAlert) {
         this.currentAlert = currentAlert;
     }
+
     public ArrayList<TimedAlert> getTimedAlerts() {
         return timedAlerts;
     }
+
     public void sendAlert(String message) {
         TimedAlert timedAlert = new TimedAlert(message, 3);
         addAlert(timedAlert);
 //        ChatController.sendAlert(player, message);
     }
+
     public void sendAlert(String message, Sound sound) {
         TimedAlert alert = new TimedAlert(message, 3);
         alert.setSound(sound);
         addAlert(alert);
     }
+
     public void sendAlert(String message, Sound sound, float loudness, float speed) {
         TimedAlert alert = new TimedAlert(message, 3);
         alert.setSound(sound);
@@ -117,22 +142,27 @@ public class RPlayer {
     public void setCash(long cash) {
         this.cash = cash;
     }
+
     public void addCash(long amount) {
         cash += amount;
     }
+
     public void removeCash(long amount) {
         cash -= amount;
     }
+
     public long getCash() {
         return cash;
     }
-    
+
     public boolean attemptPurchase(long price) {
         return attemptPurchase(price, null, false);
     }
+
     public boolean attemptPurchase(long price, boolean alert) {
         return attemptPurchase(price, null, alert);
     }
+
     public boolean attemptPurchase(long price, String item, boolean alert) {
         long newCash = cash - price;
         boolean status = !(newCash <= 0);
@@ -159,24 +189,61 @@ public class RPlayer {
     public long getPayCheckTime() {
         return PayCheckTime;
     }
+
     public void setPayCheckTime(long payCheckTime) {
         PayCheckTime = payCheckTime;
+    }
+
+    public void updatePayCheckTime() {
+        setPayCheckTime(System.currentTimeMillis() + (job.getInterval() * 1000L));
     }
 
     public Job getJob() {
         return job;
     }
+
     public void setJob(String jobName) {
         Job oldJob = getJob();
         Job job = JobController.getJob(jobName);
         if(job != null) {
             this.job = job;
-            long nextPayCheck = System.currentTimeMillis() + (job.getInterval() * 1000L);
-            setPayCheckTime(nextPayCheck);
+            updatePayCheckTime();
             sendMessage("Job set to " + job.getName());
             Bukkit.getPluginManager().callEvent(new PlayerChangeJobEvent(this, oldJob, job));
         } else {
             sendMessage("Cannot set job to " + jobName);
+        }
+    }
+
+    public File getPlayerFile() {
+        return playerFile;
+    }
+
+    public void playerFileCheck() {
+        try {
+            if(!playersFolder.exists()) playersFolder.mkdir();
+            if(!playerFile.exists()) playerFile.createNewFile();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadPlayerFile() {
+        playerFileCheck();
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
+        cash = config.getLong("cash");
+        bank = config.getLong("bank");
+    }
+
+    public void savePlayerFile() {
+        playerFileCheck();
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(getPlayerFile());
+        config.set("cash", cash);
+        config.set("bank", bank);
+        try {
+            config.save(playerFile);
+        } catch(IOException e) {
+            e.printStackTrace();
         }
     }
 

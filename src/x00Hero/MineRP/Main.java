@@ -26,6 +26,7 @@ import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.PayCheckController;
 import x00Hero.MineRP.Player.RPlayer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -34,9 +35,11 @@ public class Main extends JavaPlugin {
     public static Plugin plugin;
     private static HashMap<UUID, RPlayer> players = new HashMap<>();
     public static final PluginManager pm = Bukkit.getPluginManager();
+    public static File playersFolder;
 
     public void onEnable() {
         plugin = this;
+        playersFolder = new File(plugin.getDataFolder(), "players");
         registerEvents();
         cacheConfigs();
         registerLoops();
@@ -63,6 +66,7 @@ public class Main extends JavaPlugin {
         getCommand("advert").setExecutor(new CommandManager());
         getCommand("minerp").setExecutor(new CommandManager());
         getCommand("printers").setExecutor(new CommandManager());
+        getCommand("balance").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
@@ -105,6 +109,7 @@ public class Main extends JavaPlugin {
         rPlayer.setJob("citizen");
         rPlayer.setDefaultItems();
         addRPlayer(rPlayer);
+        rPlayer.loadPlayerFile();
     }
 
     public static boolean hasTags(ItemStack itemStack, String tag) {
