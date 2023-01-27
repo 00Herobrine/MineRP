@@ -1,6 +1,7 @@
 package x00Hero.MineRP.Player;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorDestroyedEvent;
 import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorPlacedEvent;
-import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
+import x00Hero.MineRP.Events.Constructors.Doors.DoorInteractEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.Items.Generic.OwnableDoor;
 import x00Hero.MineRP.Jobs.JobItem;
@@ -30,6 +31,7 @@ public class DoorController implements Listener {
     private static File doorsFile = new File(plugin.getDataFolder(), "doors.yml");
     private YamlConfiguration config = YamlConfiguration.loadConfiguration(doorsFile);
     private static HashMap<Location, OwnableDoor> cachedDoors = new HashMap<>();
+    private static HashMap<Location, UUID> interactedLevers = new HashMap<>();
 
     public static void cacheDoors() {
         if(!doorsFile.exists()) plugin.saveResource("doors.yml", false);
@@ -57,45 +59,60 @@ public class DoorController implements Listener {
 
     @EventHandler
     public void DoorInteract(DoorInteractEvent e) {
-        RPlayer rPlayer = e.getRPlayer();
-        Player player = rPlayer.getPlayer();
         OwnableDoor door = e.getDoor();
         Location location = door.getLocation();
         World world = location.getWorld();
-        boolean rightClick = e.isRightClick();
-        boolean isSneaking = player.isSneaking();
-        boolean isKeys = e.isKeys();
-        boolean isOwner = door.isOwner(player.getUniqueId()); // checks if is an owner of the door
-        if(door.getOwner() == null && isSneaking && isKeys && rightClick) {
-            // buy door
-            e.getInteractEvent().setCancelled(true);
-            buyDoor(rPlayer, door);
-            return;
-        }
-        if(isOwner) {
-            if(isKeys) {
-                if(rightClick) {
-                    e.getInteractEvent().setCancelled(true);
-                    door.setLocked(true);
-                    rPlayer.sendAlert("Door &cLocked&r!");
-                    location.getWorld().playSound(location, door.getLockSound(), 1f, 1f);
-                } else {
-                    door.setLocked(false);
-                    if(isSneaking) {
-                        sellDoor(door);
-                        return;
-                    }
-                    rPlayer.sendAlert("Door &aUnlocked&r!");
-                    location.getWorld().playSound(location, door.getUnlockSound(), 1f, 1f);
-                }
+        if(e.getInteractEvent() != null) {
+            RPlayer rPlayer = e.getRPlayer();
+            Player player = rPlayer.getPlayer();
+            boolean rightClick = e.isRightClick();
+            boolean isSneaking = player.isSneaking();
+            boolean isKeys = e.isKeys();
+            boolean isOwner = door.isOwner(player.getUniqueId()); // checks if is an owner of the door
+            if(door.getOwner() == null && isSneaking && isKeys && rightClick) {
+                // buy door
+                e.getInteractEvent().setCancelled(true);
+                buyDoor(rPlayer, door);
                 return;
             }
-        }
-        if(door.isLocked()) {
-            world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.7f, 1f); // play knocking sound
-            TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 3);
-            if(rightClick) rPlayer.addAlert(alert);
-            e.getInteractEvent().setCancelled(true);
+            if(isOwner) {
+                if(isKeys) {
+                    if(rightClick) {
+                        e.getInteractEvent().setCancelled(true);
+                        door.setLocked(true);
+                        rPlayer.sendAlert("Door &cLocked&r!");
+                        location.getWorld().playSound(location, door.getLockSound(), 1f, 1f);
+                    } else {
+                        door.setLocked(false);
+                        if(isSneaking) {
+                            sellDoor(door);
+                            return;
+                        }
+                        rPlayer.sendAlert("Door &aUnlocked&r!");
+                        location.getWorld().playSound(location, door.getUnlockSound(), 1f, 1f);
+                    }
+                    return;
+                }
+            }
+            if(door.isLocked()) {
+                world.playSound(location, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.7f, 1f); // play knocking sound
+                TimedAlert alert = new TimedAlert("Door is &cLocked&r!", 3);
+                if(rightClick) rPlayer.addAlert(alert);
+                e.getInteractEvent().setCancelled(true);
+            }
+        } else {
+            Block block = e.getRedstoneEvent().getBlock();
+            boolean found = false;
+            for(Location lever : interactedLevers.keySet()) {
+                if(found) break;
+                if(lever.distance(block.getLocation()) <= 2) {
+                    if(!door.isOwner(interactedLevers.get(lever))) break;
+                    found = true;
+                }
+            }
+            if(!found) e.getRedstoneEvent().setNewCurrent(0);
+            removeLeverInteract(block);
+            /*if(door.isOwner(interactedLevers.get(block)))*/
         }
     }
 
@@ -145,12 +162,11 @@ public class DoorController implements Listener {
         door.setOwner(null);
         door.setOwners(emptyOwner);
         int amount = door.getPrice() - door.getSellFee();
-        owner.sendAlert("Sold door for " + amount);
-        owner.addCash(amount);
+        owner.soldItem(amount, door.getID(), true);
     }
 
     public void buyDoor(RPlayer rPlayer, OwnableDoor door) {
-        if(rPlayer.attemptPurchase(door.getPrice(), "door", true))
+        if(rPlayer.attemptPurchase(door.getPrice(), door.getID(), true))
             door.setOwner(rPlayer.getPlayer().getUniqueId());
     }
 
@@ -164,6 +180,14 @@ public class DoorController implements Listener {
 
     public static ItemStack getKeyRing() {
         return keyRing;
+    }
+
+    public static void addLeverInteract(Player player, Block block) {
+        interactedLevers.put(block.getLocation(), player.getUniqueId());
+    }
+
+    public static void removeLeverInteract(Block block) {
+        interactedLevers.remove(block.getLocation());
     }
 
 

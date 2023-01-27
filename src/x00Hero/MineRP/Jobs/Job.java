@@ -3,6 +3,8 @@ package x00Hero.MineRP.Jobs;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 
 import java.util.ArrayList;
 
@@ -133,5 +135,9 @@ public class Job {
             Material material = Material.valueOf(config.getString("material"));
             setMaterial(material);
         }
+    }
+
+    public ItemStack getItemStack() {
+        return new ItemBuilder(material, name, description).getItemStack();
     }
 }

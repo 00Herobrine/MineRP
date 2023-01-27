@@ -3,6 +3,7 @@ package x00Hero.MineRP.Items.Generic;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -113,6 +114,9 @@ public class OwnableDoor {
     }
     public void setOwners(ArrayList<UUID> owners) {
         this.owners = owners;
+    }
+    public boolean isOwner(Player player) {
+        return isOwner(player.getUniqueId());
     }
     public boolean isOwner(UUID uuid) {
         return (owner == uuid || owners.contains(uuid));

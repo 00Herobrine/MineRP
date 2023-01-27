@@ -13,15 +13,16 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
-import x00Hero.MineRP.GUI.Constructors.MenuItemClickedEvent;
+import x00Hero.MineRP.GUI.Constructors.MenuPage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import static x00Hero.MineRP.GUI.MenuController.getPage;
+import static x00Hero.MineRP.GUI.MenuController.inMenu;
 import static x00Hero.MineRP.Main.plugin;
 
 public class InventoryClick implements Listener {
-    private static HashMap<Player, Menu> inMenus = new HashMap<>();
+
     // maybe temporarily store the Player with playerFile in a hashmap so I don't need to constantly store all this in NBT (can be viewed by players)
     // HashMap<Player, File> fileAccess
     public String getStoredString(ItemStack itemStack, String key) {
@@ -35,26 +36,23 @@ public class InventoryClick implements Listener {
         return null;
     }
 
-    public static void setMenu(Player player, Menu menu) {
-        inMenus.put(player, menu);
-    }
-
     @EventHandler
     public void inventoryClick(InventoryClickEvent e) {
-        Player p = (Player) e.getWhoClicked();
-        if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
-        if(e.getCurrentItem().equals(Menu.nothing.getItemStack())) {
+        Player player = (Player) e.getWhoClicked();
+        ItemStack clickedItem = e.getCurrentItem();
+        if(clickedItem == null || clickedItem.getType() == Material.AIR || e.getClickedInventory() == null) return;
+        if(clickedItem.equals(Menu.nothing.getItemStack())) {
             e.setCancelled(true);
             return;
         }
-        if(inMenus.containsKey(p)) {
-            Menu menuViewer = inMenus.get(p);
-            if(e.getView().getTopInventory().equals(menuViewer.getCurrentInventory())) {
-                ArrayList<MenuItem> menuItems = menuViewer.getCurrentPage().getMenuItems();
+        if(inMenu(player)) {
+            MenuPage page = getPage(player);
+            if(e.getClickedInventory().equals(page.getInventory())) {
+                ArrayList<MenuItem> menuItems = page.getMenuItems();
                 if(menuItems != null) {
                     for(MenuItem menuItem : menuItems) {
-                        if(e.getCurrentItem().equals(menuItem.getItemStack())) {
-                            Bukkit.getServer().getPluginManager().callEvent(new MenuItemClickedEvent(p, menuItem, menuViewer, e));
+                        if(clickedItem.equals(menuItem.getItemStack())) {
+                            Bukkit.getServer().getPluginManager().callEvent(new MenuItemClickedEvent(player, menuItem, page.getMenu(), e));
                             return;
                         }
                     }

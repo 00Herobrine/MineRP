@@ -110,8 +110,8 @@ public class PrinterController implements Listener {
             MenuItem menuItem = new MenuItem(printer.getItemStack(), printerID);
             menuItems.add(menuItem);
         }
-        Menu menu = new Menu(menuItems, "Money Printers", true, true);
-        menu.openMenu(player);
+//        Menu menu = new Menu(menuItems, "Money Printers", true, true);
+//        menu.openMenu(player);
 //        Menu menu = new Menu("Printers");
     }
 

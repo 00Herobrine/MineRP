@@ -10,13 +10,17 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
+import static x00Hero.MineRP.GUI.Constructors.Menu.fillInventory;
+import static x00Hero.MineRP.GUI.Constructors.Menu.getAdjustedAmount;
+import static x00Hero.MineRP.GUI.MenuController.setInMenu;
+
 public class MenuPage {
-    private Inventory inventory;
+    private Menu menu;
+    private Inventory inventory = null;
     private int curSlot = 0;
     private int lastSlot = 0;
     public static int prevSlot = 45;
     public static int nextSlot = 53;
-    private int size, rows;
     boolean fillEmpty = true;
     boolean cancelClicks = true;
     private static ItemBuilder prevBuilder = new ItemBuilder(Material.ORANGE_STAINED_GLASS_PANE, "&7Previous Page", "&8Click to return a page.");
@@ -30,19 +34,9 @@ public class MenuPage {
         return ChatColor.translateAlternateColorCodes('&', input);
     }
 
-    public MenuPage(String title, int size, boolean fillEmpty, boolean cancelClicks) {
+    public MenuPage(String title, boolean fillEmpty, Menu menu) {
         this.title = title;
-        this.size = size;
-        this.rows = (int) Math.ceil((double) size / 9);
         this.fillEmpty = fillEmpty;
-        this.cancelClicks = cancelClicks;
-        int invSize = rows * 9;
-        if(invSize > 54) invSize = 54;
-        if(size <= 5) {
-            inventory = Bukkit.createInventory(null, InventoryType.HOPPER, Colorize(title));
-        } else {
-            inventory = Bukkit.createInventory(null, invSize, Colorize(title));
-        }
     }
 
     public void setTitle(String title) {
@@ -66,26 +60,20 @@ public class MenuPage {
         }
     }
 
-    @Deprecated(forRemoval = true)
-    public void setItem(ItemStack item, Integer slot) {
-        MenuItem menuItem = new MenuItem(item, slot, "default");
-        menuItem.setMenuPage(this);
-        expandCheck(menuItem);
-        inventory.setItem(slot, item);
-        menuItems.add(menuItem);
-    }
-
-    public void addItem(MenuItem menuItem){
+    public void addItem(MenuItem menuItem) {
         addItem(menuItem, false);
     }
 
     public void addItem(MenuItem menuItem, boolean expandCheck) {
         menuItem.setMenuPage(this);
-        if(expandCheck) expandCheck(menuItem);
-        if(menuItem.isEnabled()) inventory.setItem(menuItem.getSlot(), menuItem.getItemStack());
+//        if(expandCheck) expandCheck(menuItem);
+//        if(menuItem.isEnabled()) inventory.setItem(menuItem.getSlot(), menuItem.getItemStack());
         menuItems.add(menuItem);
     }
 
+    public boolean isFillEmpty() {
+        return fillEmpty;
+    }
     public void setFillEmpty(boolean fillEmpty) {
         this.fillEmpty = fillEmpty;
     }
@@ -93,34 +81,35 @@ public class MenuPage {
     public void setCancelClicks(boolean cancelClicks) {
         this.cancelClicks = cancelClicks;
     }
-
-    public boolean isFillEmpty() {
-        return fillEmpty;
-    }
-
     public boolean isCancelClicks() {
         return cancelClicks;
-    }
-
-    public int getRows() {
-        return rows;
-    }
-
-    public int getSize() {
-        return size;
     }
 
     public Inventory getInventory() {
         return inventory;
     }
-
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
 
-    public void open(Player p) {
-        if(fillEmpty) p.openInventory(Menu.fillInventory(inventory));
-        else p.openInventory(inventory);
+    public void open(Player player) {
+        if(inventory == null) createInventory();
+        if(fillEmpty) player.openInventory(fillInventory(inventory));
+        else player.openInventory(inventory);
+        setInMenu(player, this);
+    }
+
+    public void createInventory() {
+        for(MenuItem menuItem : menuItems) {
+            if(menuItem.getSlot() == -1) menuItem.setSlot(curSlot++); // hopefully that returns 0, then adds one
+            int itemSlot = menuItem.getSlot();
+            if(lastSlot < itemSlot) lastSlot = itemSlot;
+        }
+        if(lastSlot <= 5) inventory = Bukkit.createInventory(null, InventoryType.HOPPER, title);
+        else inventory = Bukkit.createInventory(null, getAdjustedAmount(lastSlot), title);
+        for(MenuItem menuItem : menuItems) {
+            inventory.setItem(menuItem.getSlot(), menuItem.getItemStack());
+        }
     }
 
     public ArrayList<MenuItem> getMenuItems() {
@@ -136,27 +125,18 @@ public class MenuPage {
         return null;
     }
 
-    public int getNextSlot() {
-        return getInventory().firstEmpty();
-    }
-
     public int getCurSlot() {
         return curSlot;
     }
 
-    public void setCurSlot(int curSlot) {
-        this.curSlot = curSlot;
-    }
-
-    public int getLastSlot() {
-        return lastSlot;
-    }
-
-    public void setLastSlot(int lastSlot) {
-        this.lastSlot = lastSlot;
-    }
-
     public void setMenuItems(ArrayList<MenuItem> menuItems) {
         this.menuItems = menuItems;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 }

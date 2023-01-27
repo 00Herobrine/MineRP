@@ -196,6 +196,14 @@ public class RPlayer {
             else sendAlert(msg);
         return status;
     }
+
+    public void soldItem(long amount, String item, boolean alert) {
+        String msg = "&aSold &r" + item + "&a for &r$" + amount;
+        addCash(amount);
+        if(item != null)
+            if(!alert) sendMessage(msg);
+            else sendAlert(msg);
+    }
     //endregion
 
     //region Job Stuff

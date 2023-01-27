@@ -1,0 +1,7 @@
+allowed:
+  - OAK_WOOD
+  - OAK_PLANKS
+  - LEVER
+limits:
+  lever: 4
+

@@ -23,7 +23,6 @@ import x00Hero.MineRP.Items.MoneyPrinters.HologramController;
 import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Player.DoorController;
-import x00Hero.MineRP.Player.PayCheckController;
 import x00Hero.MineRP.Player.RPlayer;
 
 import java.io.File;
@@ -73,7 +72,6 @@ public class Main extends JavaPlugin {
     public void registerEvents() {
         pm.registerEvents(new InteractHandler(), this);
         pm.registerEvents(new PlayerJoin(), this);
-        pm.registerEvents(new PayCheckController(), this);
         pm.registerEvents(new DoorController(), this);
         pm.registerEvents(new JobController(), this);
         pm.registerEvents(new Lockpick(), this);
@@ -136,7 +134,7 @@ public class Main extends JavaPlugin {
         return false;
     }
 
-    public ArrayList<Player> getPlayersInDistance(Location location, double distance) {
+    public static ArrayList<Player> getPlayersInDistance(Location location, double distance) {
         ArrayList<Player> inDistance = new ArrayList<>();
         ArmorStand entity = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
         entity.setCustomName(" ");

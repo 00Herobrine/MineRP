@@ -7,14 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.GUI.Constructors.Menu;
 import x00Hero.MineRP.GUI.Constructors.MenuItem;
-import x00Hero.MineRP.GUI.Constructors.MenuItemClickedEvent;
+import x00Hero.MineRP.GUI.Constructors.MenuPage;
+import x00Hero.MineRP.GUI.Events.MenuItemClickedEvent;
 import x00Hero.MineRP.Jobs.JobItem;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class MenuController {
-    private static HashMap<UUID, Menu> inMenu = new HashMap<>();
+    private static HashMap<UUID, MenuPage> inMenu = new HashMap<>();
     private static ItemBuilder jobBookBuilder = new ItemBuilder(Material.WRITTEN_BOOK, "Actions Menu", "Opens a menu of stuff", "menubook");
     public static JobItem jobBook = new JobItem(jobBookBuilder.getItemStack(), 8);
     
@@ -33,7 +34,15 @@ public class MenuController {
         }
     }
 
-    public static void setInMenu(Player player, Menu menu) {
-        inMenu.put(player.getUniqueId(), menu);
+    public static boolean inMenu(Player player) {
+        return inMenu.containsKey(player.getUniqueId());
+    }
+
+    public static MenuPage getPage(Player player) {
+        return inMenu.get(player.getUniqueId());
+    }
+
+    public static void setInMenu(Player player, MenuPage menuPage) {
+        inMenu.put(player.getUniqueId(), menuPage);
     }
 }

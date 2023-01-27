@@ -5,19 +5,23 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Events.Constructors.Crate.WeaponCratePlaceEvent;
 import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorDestroyedEvent;
 import x00Hero.MineRP.Events.Constructors.Doors.OwnableDoorPlacedEvent;
 import x00Hero.MineRP.Events.Constructors.JobItemInteractEvent;
-import x00Hero.MineRP.Events.Constructors.Player.DoorInteractEvent;
+import x00Hero.MineRP.Events.Constructors.Doors.DoorInteractEvent;
 import x00Hero.MineRP.Events.Constructors.Player.LockPickDoorEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterCreateEvent;
 import x00Hero.MineRP.Events.Constructors.Printers.PrinterDestroyedEvent;
@@ -31,6 +35,8 @@ import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Jobs.JobItem;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
+
+import java.awt.*;
 
 import static x00Hero.MineRP.Main.*;
 
@@ -57,11 +63,11 @@ public class InteractHandler implements Listener {
                 if(getTags(heldItem).equalsIgnoreCase("keyset")) isKeys = true;
                 if(getTags(heldItem).equalsIgnoreCase("lockpick")) isLockpick = true;
             }
-            if(blockType.name().contains("DOOR")) { // is a door
+            if(block.getBlockData() instanceof Door) { // is a door
                 Block above = block.getRelative(BlockFace.UP);
                 boolean isTop = false;
-                String aboveName = above.getType().name();
-                if(!aboveName.contains("DOOR") && !aboveName.contains("TRAPDOOR")) isTop = true;
+                BlockData aboveData = above.getBlockData();
+                if(!(aboveData instanceof Door) && !(aboveData instanceof TrapDoor)) isTop = true;
                 if(isTop) blockLoc = blockLoc.add(0, -1, 0);
                 if(!DoorController.getCachedDoors().containsKey(blockLoc)) return;
                 OwnableDoor door = DoorController.getDoor(blockLoc);
@@ -73,6 +79,8 @@ public class InteractHandler implements Listener {
             } else if(PrinterController.contains(blockLoc)) {
                 MoneyPrinter printer = PrinterController.getPrinter(blockLoc);
                 Bukkit.getPluginManager().callEvent(new PrinterInteractEvent(rPlayer, printer, rightClick));
+            } else if((blockType == Material.LEVER || block.getType().name().toLowerCase().contains("button")) && rightClick) {
+                DoorController.addLeverInteract(player, block);
             }
         } else if(JobController.isJobItem(heldItem)) {
             JobItem jobItem = JobController.getJobItem(getTags(heldItem));
@@ -117,6 +125,20 @@ public class InteractHandler implements Listener {
         else {
             OwnableDoor door = DoorController.getDoor(location);
             if(door != null) Bukkit.getPluginManager().callEvent(new OwnableDoorDestroyedEvent(door, player));
+        }
+    }
+
+    @EventHandler
+    public void onDoorRedstoneChange(BlockRedstoneEvent e) {
+        Block block = e.getBlock();
+        Location location = block.getLocation();
+        if(block.getBlockData() instanceof Door) {
+            Block above = block.getRelative(BlockFace.UP);
+            BlockData aboveData = above.getBlockData();
+            if(!(aboveData instanceof Door) && !(aboveData instanceof TrapDoor)) location.add(0, -1, 0);
+            OwnableDoor door = DoorController.getDoor(location);
+            if(door == null) return;
+            Bukkit.getPluginManager().callEvent(new DoorInteractEvent(door, e));
         }
     }
 

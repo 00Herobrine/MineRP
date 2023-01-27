@@ -1,8 +1,9 @@
 package x00Hero.MineRP.Jobs;
 
+import jline.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,6 +29,7 @@ public class JobController implements Listener {
     private static File jobsFile = new File(plugin.getDataFolder(), "jobs.yml");
     private static HashMap<String, JobItem> defaultItems = new HashMap<>();
     private static HashMap<String, JobItem> cachedJobItems = new HashMap<>(); //itemID, JobItem
+    private static Menu jobMenu = new Menu("Jobs");
 
     public static void cacheJobs() {
         if(!jobsFile.exists()) plugin.saveResource("jobs.yml", false);
@@ -39,6 +41,7 @@ public class JobController implements Listener {
             job.loadConfig();
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
+            jobMenu.addItem(job.getItemStack(), "menu-job-" + jobID);
         }
         defaultItems.put("lockpick", Lockpick.lockpick);
         defaultItems.put("keyset", DoorController.keys);
@@ -60,18 +63,25 @@ public class JobController implements Listener {
     }
 
     @EventHandler
-    public void PayCheck(PayCheckEvent e) {
+    public void onPayCheck(PayCheckEvent e) {
         RPlayer rPlayer = e.getRPlayer();
-        long time = System.currentTimeMillis() + (e.getDelay() * 1000L);
-        rPlayer.setPayCheckTime(time);
+        if(!rPlayer.isInJail()) {
+            long amount = e.getAmount();
+            rPlayer.sendMessage("Paycheck of $" + amount + " added to your balance.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
+            rPlayer.addCash(amount);
+            rPlayer.updatePayCheckTime();
+        } else {
+            // in jail
+            rPlayer.sendMessage("Crime doesn't pay.", Sound.BLOCK_ANVIL_FALL, 0.6f, 0.7f);
+        }
     }
 
     public static HashMap<String, JobItem> getDefaultItems() {
         return defaultItems;
     }
 
-    public static HashMap<String, Job> getJobs() {
-        return jobs;
+    public static ArrayList<Job> getJobs() {
+        return (ArrayList<Job>) jobs.values();
     }
 
     public static Job getJob(String name) {
@@ -80,7 +90,7 @@ public class JobController implements Listener {
 
     public static void JobMenu(Player player) {
         ArrayList<MenuItem> menuItems = new ArrayList<>();
-        for(Job job :  getJobs().values()) {
+        for(Job job : getJobs()) {
             Material material = job.getMaterial();
             String name = job.getName();
             String description = job.getDescription();
@@ -89,8 +99,15 @@ public class JobController implements Listener {
             MenuItem menuItem = new MenuItem(itemBuilder.getItemStack(), "menu-job-" + job.getID());
             menuItems.add(menuItem);
         }
-        Menu jobMenu = new Menu(menuItems,"Available Jobs", true, true);
-        jobMenu.openMenu(player);
+        Menu jobMenu = new Menu("Available Jobs", true);
+        jobMenu.addMenuItems(menuItems);
+        jobMenu.open(player);
+    }
+
+    public static Menu JobMenu() {
+        Menu menu = new Menu("Jobs");
+        for(Job job : getJobs()) menu.addItem(job.getItemStack(), "menu-job-" + job.getID());
+        return menu;
     }
 
     public static boolean isJobItem(ItemStack item) {
