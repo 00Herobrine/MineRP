@@ -71,6 +71,26 @@ public class ItemBuilder {
         lore = lore2;
     }
 
+    public ItemBuilder(Material MATERIAL, int amount, String NAME, String LORE, String HIDDEN) {
+        ItemStack ITEM = new ItemStack(MATERIAL, amount);
+        ItemMeta meta = ITEM.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', NAME));
+        String[] split = LORE.split("\n");
+        ArrayList<String> lore2 = new ArrayList<>();
+        for(String line : split) {
+            lore2.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        if(lore2.size() > 0 && !LORE.equals("")) meta.setLore(lore2);
+        ITEM.setItemMeta(meta);
+
+        item = ITEM;
+        material = MATERIAL;
+        name = NAME;
+        amount = 1;
+        lore = lore2;
+        storeString("tag", HIDDEN);
+    }
+
     public ItemBuilder(Material MATERIAL, String NAME, String LORE, String HIDDEN) {
         ItemStack ITEM = new ItemStack(MATERIAL);
         ItemMeta meta = ITEM.getItemMeta();

@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Menu {
     private final String title;
     private int curPage = 1;
-    private HashMap<Integer, MenuPage> pages = new HashMap<>();
+    private static HashMap<Integer, MenuPage> pages = new HashMap<>();
     private boolean fillEmpty = true, cached = false;
 
     public static ItemBuilder nothing = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE, 1, " ");
@@ -34,7 +34,10 @@ public class Menu {
 
     public void addMenuItems(ArrayList<MenuItem> menuItems) {
         if(!isValidPage(curPage)) createNewPage();
-
+        MenuPage currentPage = getCurrentPage();
+        for(MenuItem menuItem : menuItems) {
+            currentPage.addItem(menuItem);
+        }
     }
 
     public boolean isValidPage(int pageNum) {
@@ -43,7 +46,6 @@ public class Menu {
     }
 
     public void createNewPage() {
-        curPage++;
         MenuPage page = new MenuPage(title + " pg. " + curPage, fillEmpty, this);
         setPage(curPage, page);
     }
@@ -62,7 +64,7 @@ public class Menu {
     }
     public void openPage(Player player, int page) {
         if(!cached) cachePages();
-        pages.get(page).open(player);
+        getPage(page).open(player);
     }
     public MenuPage getCurrentPage() {
         return getPage(curPage);
@@ -79,6 +81,15 @@ public class Menu {
         for(MenuPage page : pages.values()) {
             page.createInventory();
         }
+        cached = true;
+    }
+
+    public static boolean isLastPage(MenuPage page) {
+        return page == pages.get(pages.size());
+    }
+
+    public static boolean isFirstPage(MenuPage page) {
+        return page == pages.get(1);
     }
 
     public static Inventory fillInventory(Inventory i) {
@@ -90,6 +101,10 @@ public class Menu {
             }
         }
         return i;
+    }
+
+    public boolean isCached() {
+        return cached;
     }
 
     public void setFillEmpty(boolean fillEmpty) {

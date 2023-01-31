@@ -18,6 +18,7 @@ import x00Hero.MineRP.Chat.ChatController;
 import x00Hero.MineRP.Chat.CommandManager;
 import x00Hero.MineRP.Events.DefaultMC.InteractHandler;
 import x00Hero.MineRP.Events.DefaultMC.PlayerJoin;
+import x00Hero.MineRP.GUI.MenuController;
 import x00Hero.MineRP.Items.Generic.Lockpick;
 import x00Hero.MineRP.Items.MoneyPrinters.HologramController;
 import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
@@ -35,6 +36,7 @@ public class Main extends JavaPlugin {
     private static HashMap<UUID, RPlayer> players = new HashMap<>();
     public static final PluginManager pm = Bukkit.getPluginManager();
     public static File playersFolder;
+    private static boolean debug = true;
 
     public void onEnable() {
         plugin = this;
@@ -46,6 +48,11 @@ public class Main extends JavaPlugin {
         getConfig();
         saveDefaultConfig();
         getLogger().info("Enabled " + getDescription().getFullName());
+    }
+
+
+    public static void debug(String message) {
+        if(debug) plugin.getLogger().info(message);
     }
 
     public static void cacheConfigs() {
@@ -67,6 +74,7 @@ public class Main extends JavaPlugin {
         getCommand("printers").setExecutor(new CommandManager());
         getCommand("balance").setExecutor(new CommandManager());
         getCommand("door").setExecutor(new CommandManager());
+        getCommand("jobs").setExecutor(new CommandManager());
     }
 
     public void registerEvents() {
@@ -78,6 +86,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new ChatController(), this);
         pm.registerEvents(new CommandManager(), this);
         pm.registerEvents(new PrinterController(), this);
+        pm.registerEvents(new MenuController(), this);
     }
 
     public static void registerLoops() {

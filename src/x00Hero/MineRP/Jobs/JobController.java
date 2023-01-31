@@ -1,6 +1,5 @@
 package x00Hero.MineRP.Jobs;
 
-import jline.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -20,6 +19,7 @@ import x00Hero.MineRP.Player.RPlayer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import static x00Hero.MineRP.Main.*;
@@ -29,7 +29,6 @@ public class JobController implements Listener {
     private static File jobsFile = new File(plugin.getDataFolder(), "jobs.yml");
     private static HashMap<String, JobItem> defaultItems = new HashMap<>();
     private static HashMap<String, JobItem> cachedJobItems = new HashMap<>(); //itemID, JobItem
-    private static Menu jobMenu = new Menu("Jobs");
 
     public static void cacheJobs() {
         if(!jobsFile.exists()) plugin.saveResource("jobs.yml", false);
@@ -41,7 +40,6 @@ public class JobController implements Listener {
             job.loadConfig();
             plugin.getLogger().info("Cached jobID " + jobID);
             jobs.put(jobID, job);
-            jobMenu.addItem(job.getItemStack(), "menu-job-" + jobID);
         }
         defaultItems.put("lockpick", Lockpick.lockpick);
         defaultItems.put("keyset", DoorController.keys);
@@ -80,8 +78,8 @@ public class JobController implements Listener {
         return defaultItems;
     }
 
-    public static ArrayList<Job> getJobs() {
-        return (ArrayList<Job>) jobs.values();
+    public static Collection<Job> getJobs() {
+        return jobs.values();
     }
 
     public static Job getJob(String name) {
@@ -90,16 +88,17 @@ public class JobController implements Listener {
 
     public static void JobMenu(Player player) {
         ArrayList<MenuItem> menuItems = new ArrayList<>();
+        Menu jobMenu = new Menu("Jobs", true);
         for(Job job : getJobs()) {
             Material material = job.getMaterial();
             String name = job.getName();
             String description = job.getDescription();
             description = description.replace("{count}", "1").replace("{max}", job.getMax() + "");
             ItemBuilder itemBuilder = new ItemBuilder(material, name, description);
+//            jobMenu.addItem(itemBuilder.getItemStack(), "menu-job-" + job.getID());
             MenuItem menuItem = new MenuItem(itemBuilder.getItemStack(), "menu-job-" + job.getID());
             menuItems.add(menuItem);
         }
-        Menu jobMenu = new Menu("Available Jobs", true);
         jobMenu.addMenuItems(menuItems);
         jobMenu.open(player);
     }

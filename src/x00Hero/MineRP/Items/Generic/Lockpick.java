@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,7 +13,6 @@ import x00Hero.MineRP.Chat.ChatController;
 import x00Hero.MineRP.Events.Constructors.Player.LockPickDoorEvent;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
 import x00Hero.MineRP.Jobs.JobItem;
-import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static x00Hero.MineRP.Main.plugin;
+import static x00Hero.MineRP.Main.*;
 
 public class Lockpick implements Listener {
-    private static final ItemBuilder lockpickBuilder = new ItemBuilder(Material.STICK, "Lockpick", "A universal key if you know how to use it.", "lockpick");
+    private static final ItemBuilder lockpickBuilder = new ItemBuilder(Material.STICK, 32, "Lockpick", "A universal key if you know how to use it.", "lockpick");
     private static final ItemStack lockpickItem = lockpickBuilder.getItemStack();
     public static JobItem lockpick = new JobItem(lockpickItem, 6);
     private static final ArrayList<Location> lockpicking = new ArrayList<>(); // doors being lockpicked
@@ -39,11 +39,10 @@ public class Lockpick implements Listener {
         float percent = (float) current / max;
         int progressBars = (int) (totalBars * percent);
         int leftOver = (totalBars - progressBars);
-        String sb = ChatColor.translateAlternateColorCodes('&', completedColor) +
+        return ChatColor.translateAlternateColorCodes('&', completedColor) +
                 String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
                 ChatColor.translateAlternateColorCodes('&', notCompletedColor) +
                 String.valueOf(symbol).repeat(Math.max(0, leftOver));
-        return sb;
     }
 
     public static void addCooldown(UUID uuid) {
@@ -70,10 +69,10 @@ public class Lockpick implements Listener {
                     long delay = curTime - lockStat.getLastPicked();
 //                    Main.getRPlayer(picker).sendMessage("delay " + delay);
                     if(delay >= timeout) {
-                        Main.getRPlayer(picker).sendAlert("Lock picking interrupted. (" + delay + "ms)");
-                        door.finishLockPicking(picker);
+                        pm.callEvent(new LockPickDoorEvent(getRPlayer(Bukkit.getPlayer(picker)), door, null));
                     }
                 }
+                door.playSound(door.getLockpickSound(), 1f, 1f);
             }
             for(UUID uuid : cooldowns.keySet()) {
                 if(cooldowns.get(uuid) < curTime) removeCooldown(uuid);
@@ -81,8 +80,8 @@ public class Lockpick implements Listener {
         }, 0, 20);
     }
 
-    public void startLockPicking(OwnableDoor door, UUID playerID) {
-        door.startLockPicking(playerID);
+    public void startLockPicking(OwnableDoor door, UUID playerID, ItemStack itemStack) {
+        door.startLockPicking(playerID, itemStack);
         lockpicking.add(door.getLocation());
     }
 
@@ -93,13 +92,13 @@ public class Lockpick implements Listener {
         UUID playerID = player.getUniqueId();
         OwnableDoor door = e.getDoor();
         LockPickStat lockStat = door.getLockPickStat(playerID);
-        e.getInteractEvent().setCancelled(true);
+        if(!e.isFailed()) e.getInteractEvent().setCancelled(true);
         if(!cooldowns.containsKey(playerID)) {
             if(!door.isLockPicking(playerID)) { // hasn't started picking yet
-                startLockPicking(door, playerID);
+                startLockPicking(door, playerID, e.getInteractEvent().getItem());
                 lockStat = door.getLockStat(playerID);
             }
-            if(!player.isSneaking() && !lockStat.isAlerted()) {
+            if(!player.isSneaking() && !lockStat.isAlerted() && !e.isFailed()) {
                 rPlayer.sendMessage("Sneaking is advised to avoid the client door noise.");
                 lockStat.setAlerted(true);
             }
@@ -112,8 +111,10 @@ public class Lockpick implements Listener {
             long delay = curTime - lastInteractTime;
             String progressBar = getProgressBar(elapsedTime + 1, door.getDefaultLockPickTime(), 25, "|", "&2", "&7");
             ChatController.sendAlert(player, progressBar + " &r(" + timeRemaining + "s)");
-            if(delay > timeout) {
-                rPlayer.sendAlert("Lock picking interrupted. (" + delay + "ms)");
+            if(delay > timeout || e.isFailed()) {
+                rPlayer.sendAlert("Lockpick broke. (" + delay + "ms)");
+                door.playSound(Sound.ENTITY_GOAT_HORN_BREAK, 0.4f, 0.8f);
+                e.getLockpick().setAmount(e.getLockpick().getAmount() - 1);
                 door.finishLockPicking(playerID);
                 return;
                 // Player's last interaction was too long ago or this is their first interaction

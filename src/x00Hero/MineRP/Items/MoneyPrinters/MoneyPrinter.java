@@ -2,21 +2,39 @@ package x00Hero.MineRP.Items.MoneyPrinters;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.GUI.Constructors.ItemBuilder;
-import x00Hero.MineRP.GUI.Constructors.Menu;
+
+import static x00Hero.MineRP.Items.MoneyPrinters.PrinterController.getPrintersFile;
 
 public class MoneyPrinter {
     private boolean enabled, alert;
     private Material material;
     private int generateMin, generateMax, battery, maxBattery, interval, balance, maxCash, printTime, price, ownLimit;
-    private String permission = null, name, lore;
+    private String permission = null, name, lore, printerID;
     private ItemStack itemStack = null;
     private Location location;
     private Hologram hologram;
 //    private Menu printerMenu = new Menu("Printer", "Printer", false, true);
 
     public MoneyPrinter() {
+        printerID = null;
+        name = "Money Printer";
+        material = Material.SMOOTH_STONE_SLAB;
+        enabled = false;
+        alert = true;
+        generateMin = 15;
+        generateMax = 20;
+        battery = 100;
+        interval = 120;
+        maxCash = 250;
+        printTime = interval;
+    }
+
+    public MoneyPrinter(String ID) {
+        printerID = ID;
         name = "Money Printer";
         material = Material.SMOOTH_STONE_SLAB;
         enabled = false;
@@ -194,6 +212,22 @@ public class MoneyPrinter {
         interval = defaults.getInterval();
         maxCash = defaults.getMaxCash();
         printTime = defaults.getInterval();
+    }
+
+    public void load() {
+        YamlConfiguration printers = YamlConfiguration.loadConfiguration(getPrintersFile());
+        ConfigurationSection printerConfig = printers.getConfigurationSection("printers." + printerID);
+        if(printerConfig.contains("name")) setName(printerConfig.getString("name")); else setName(printerID);
+        if(printerConfig.contains("lore")) setLore(printerConfig.getString("lore"));
+        if(printerConfig.contains("material")) setMaterial(Material.valueOf(printerConfig.getString("material")));
+        if(printerConfig.contains("price")) setPrice(printerConfig.getInt("price"));
+        if(printerConfig.contains("generateMin")) setGenerateMin(printerConfig.getInt("generateMin"));
+        if(printerConfig.contains("generateMax")) setGenerateMax(printerConfig.getInt("generateMax"));
+        if(printerConfig.contains("maxCash")) setMaxCash(printerConfig.getInt("maxCash"));
+        if(printerConfig.contains("maxBattery")) setMaxBattery(printerConfig.getInt("maxBattery"));
+        if(printerConfig.contains("interval")) setInterval(printerConfig.getInt("interval"));
+        if(printerConfig.contains("limit")) setOwnLimit(printerConfig.getInt("limit"));
+        if(printerConfig.contains("permission")) setPermission(printerConfig.getString("permission"));
     }
 
     public boolean hasAlert() {

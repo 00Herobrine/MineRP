@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Chat.ChatController;
 import x00Hero.MineRP.Events.Constructors.Player.PlayerChangeJobEvent;
+import x00Hero.MineRP.Items.MoneyPrinters.PrinterController;
 import x00Hero.MineRP.Jobs.Job;
 import x00Hero.MineRP.Jobs.JobController;
 import x00Hero.MineRP.Jobs.JobItem;
@@ -178,6 +179,30 @@ public class RPlayer {
     public long getCash() {
         return cash;
     }
+    public void attemptBankWithdraw(long amount) {
+        if(amount <= 0) {
+            sendMessage("How about you go get some bitches");
+            return;
+        }
+        if(amount > bank) amount = bank;
+        removeBank(amount);
+        addCash(amount);
+    }
+    public void attemptBankDeposit(long amount) {
+        if(cash <= 0) {
+            sendMessage("How about you go get some bitches");
+            return;
+        }
+        if(amount > cash) amount = cash;
+        removeCash(amount);
+        addBank(amount);
+    }
+    public void addBank(long amount) {
+        bank += amount;
+    }
+    public void removeBank(long amount) {
+        bank -= amount;
+    }
 
     public boolean attemptPurchase(long price) {
         return attemptPurchase(price, null, false);
@@ -241,9 +266,15 @@ public class RPlayer {
             sendMessage("Cannot set job to " + jobName);
         }
     }
+    //endregion
+
+    //region Menus
+    public void openPrintersMenu() {
+        PrinterController.printersMenu(player);
+    }
     public void openJobsMenu() {
         JobController.JobMenu(player);
     }
-    //endRegion
+    //endregion
 
 }

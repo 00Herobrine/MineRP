@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import x00Hero.MineRP.Main;
 import x00Hero.MineRP.Player.RPlayer;
 
@@ -36,7 +37,7 @@ public class OwnableDoor {
         this.defaultLockPickTime = 5;
         this.lockSound = Sound.BLOCK_CHAIN_BREAK;
         this.unlockSound = Sound.BLOCK_CHAIN_PLACE;
-        this.lockpickSound = Sound.ITEM_ARMOR_EQUIP_IRON;
+        this.lockpickSound = Sound.BLOCK_COPPER_BREAK;
     }
 
     //region General
@@ -152,9 +153,9 @@ public class OwnableDoor {
     public boolean isLockPicking(UUID uuid) {
         return lockpickers.containsKey(uuid);
     }
-    public void startLockPicking(UUID uuid) {
+    public void startLockPicking(UUID uuid, ItemStack lockpick) {
         long finishTime = System.currentTimeMillis() + (defaultLockPickTime * 1000L);
-        LockPickStat lockStat = new LockPickStat(System.currentTimeMillis(), finishTime);
+        LockPickStat lockStat = new LockPickStat(lockpick, System.currentTimeMillis(), finishTime);
         lockpickers.put(uuid, lockStat);
     }
     public void finishLockPicking(UUID uuid) {

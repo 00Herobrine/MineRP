@@ -36,7 +36,7 @@ public class CommandManager implements CommandExecutor, Listener {
                 }
                 break;
             case "jobs":
-                JobController.JobMenu(player);
+                rPlayer.openJobsMenu();
                 break;
             case "menu":
                 break;
@@ -49,6 +49,9 @@ public class CommandManager implements CommandExecutor, Listener {
                     } else {
                         rPlayer.sendMessage("Invalid arguments.");
                     }
+                    break;
+                } else if(args.length == 0) {
+                    rPlayer.openPrintersMenu();
                     break;
                 }
                 Location location = player.getLocation();

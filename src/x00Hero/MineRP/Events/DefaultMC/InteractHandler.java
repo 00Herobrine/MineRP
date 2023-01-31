@@ -36,8 +36,6 @@ import x00Hero.MineRP.Jobs.JobItem;
 import x00Hero.MineRP.Player.DoorController;
 import x00Hero.MineRP.Player.RPlayer;
 
-import java.awt.*;
-
 import static x00Hero.MineRP.Main.*;
 
 public class InteractHandler implements Listener {

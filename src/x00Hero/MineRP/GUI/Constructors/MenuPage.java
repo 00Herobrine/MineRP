@@ -10,8 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
-import static x00Hero.MineRP.GUI.Constructors.Menu.fillInventory;
-import static x00Hero.MineRP.GUI.Constructors.Menu.getAdjustedAmount;
+import static x00Hero.MineRP.GUI.Constructors.Menu.*;
 import static x00Hero.MineRP.GUI.MenuController.setInMenu;
 
 public class MenuPage {
@@ -29,6 +28,8 @@ public class MenuPage {
     public static MenuItem nextPage = new MenuItem(nextBuilder.getItemStack(), nextSlot, "menu-page-next");
     private ArrayList<MenuItem> menuItems = new ArrayList<>();
     private String title;
+    private static boolean previousButton;
+    private static boolean nextButton;
 
     public String Colorize(String input) {
         return ChatColor.translateAlternateColorCodes('&', input);
@@ -100,13 +101,18 @@ public class MenuPage {
     }
 
     public void createInventory() {
+        boolean isFirstPage = isFirstPage(this);
         for(MenuItem menuItem : menuItems) {
+            if(menuItems.size() > 52 && curSlot == prevSlot && !isFirstPage) curSlot++;
+            // shift last item to next page
             if(menuItem.getSlot() == -1) menuItem.setSlot(curSlot++); // hopefully that returns 0, then adds one
             int itemSlot = menuItem.getSlot();
             if(lastSlot < itemSlot) lastSlot = itemSlot;
         }
         if(lastSlot <= 5) inventory = Bukkit.createInventory(null, InventoryType.HOPPER, title);
         else inventory = Bukkit.createInventory(null, getAdjustedAmount(lastSlot), title);
+        if(!isLastPage(this) && menuItems.size() > 52) inventory.setItem(nextSlot, nextBuilder.getItemStack());
+        if(!isFirstPage && menuItems.size() > 52) inventory.setItem(prevSlot, prevBuilder.getItemStack());
         for(MenuItem menuItem : menuItems) {
             inventory.setItem(menuItem.getSlot(), menuItem.getItemStack());
         }
